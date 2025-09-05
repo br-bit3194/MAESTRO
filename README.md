@@ -216,29 +216,68 @@ curl -X POST "http://localhost:8004/workflows" \
 curl -X POST "http://localhost:8004/workflows/{workflow_id}/execute"
 ```
 
+## Frontend Dashboard
+
+A React + Tailwind CSS dashboard is available in the `frontend/` directory:
+
+- **Health Status Card** with dummy system data
+- **Tickets Table** with static sample data  
+- **Health Check Button** (ready for API integration)
+- **Service Overview** showing all 5 services
+
+### Quick Start Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
+Open http://localhost:3000
+
 ## Development
 
 ### Project Structure
 ```
 MAESTRO/
+├── frontend/               # React + Tailwind dashboard
+│   ├── src/
+│   │   ├── components/
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── tailwind.config.js
 ├── ticket/                 # Ticket management service
 │   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── database.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── healthcheck/            # Health monitoring service
 │   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── services.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── memory/                 # Memory storage service
 │   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── storage.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── orchestrator/           # Workflow orchestration service
 │   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── services.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── sandbox/                # Code execution service
 │   ├── main.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── executor.py
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── requirements.txt        # Shared dependencies
