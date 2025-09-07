@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
                 </ul>
             </nav>
             <div className="mt-auto text-center text-gray-600 text-sm">
-                <p>&copy; 2024 MAESTRO</p>
+                <p>&copy; 2025 MAESTRO</p>
                 <p>v1.0.0</p>
             </div>
         </aside>

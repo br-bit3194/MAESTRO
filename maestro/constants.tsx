@@ -38,7 +38,7 @@ export const MOCK_ALERTS: Alert[] = [
 export const MOCK_TICKETS: Ticket[] = [
     {
         id: 101,
-        user: 'Alice Johnson',
+        user: 'Akash Anand',
         userAvatar: 'https://picsum.photos/id/1011/100/100',
         subject: "Can't connect to VPN",
         status: TicketStatus.Escalated,
@@ -59,7 +59,7 @@ export const MOCK_TICKETS: Ticket[] = [
     },
     {
         id: 102,
-        user: 'Bob Williams',
+        user: 'Bhavesh Rathod',
         userAvatar: 'https://picsum.photos/id/1005/100/100',
         subject: "Outlook keeps crashing",
         status: TicketStatus.Resolved,
@@ -75,7 +75,7 @@ export const MOCK_TICKETS: Ticket[] = [
     },
     {
         id: 104,
-        user: 'Dana Scully',
+        user: 'Tejeshwari Chouhan',
         userAvatar: 'https://picsum.photos/id/1027/100/100',
         subject: "Outlook is slow and keeps freezing",
         status: TicketStatus.AI_Responding,
