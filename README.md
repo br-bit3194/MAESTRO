@@ -1,174 +1,107 @@
-# MAESTRO - Multi-Agent System with CrewAI
+# MAESTRO - AI-Powered Multi-Agent IT Operations Platform
 
-A Python-based multi-agent architecture using CrewAI and Google Gemini LLM for intelligent task orchestration and delegation.
+MAESTRO is a swarm-based multi-agent system built on the Strands framework that automates IT operations through intelligent agent collaboration with persistent memory capabilities.
 
-## Overview
+## Architecture
 
-MAESTRO demonstrates a hierarchical multi-agent system where an Orchestrator Agent receives tasks and intelligently routes them to specialized worker agents:
+- **Orchestrator Agent**: Routes incoming tickets through memory system first, then to specialized agents
+- **Memory Agent**: Stores, retrieves, and lists past resolutions using mem0.ai for persistent memory
+- **Ticketing Agent**: Processes raw trouble tickets into structured format
+- **Network Diagnostic Agent**: Performs network troubleshooting with ping, traceroute, and DNS tools
+- **Cloud Service Agent**: Handles AWS/cloud service operations and troubleshooting
 
-- **Orchestrator Agent**: Receives tasks and routes them to appropriate worker agents
-- **Ticket Agent**: Logs ticket requests into a stub database (Python dict)
-- **Memory Agent**: Stores and retrieves knowledge and conversation history
-- **Worker Agent**: Base class for specialized workers with a generic implementation
+## Memory Integration Workflow
 
-## Features
+1. **Query Reception**: Orchestrator receives trouble ticket
+2. **Memory Check**: Hands off to Memory Agent to search for similar past resolutions
+3. **Memory Response**: 
+   - If found: Returns cached resolution
+   - If not found: Proceeds to appropriate specialized agent
+4. **Resolution Storage**: After successful resolution, stores solution in memory for future use
 
-- 🤖 **Multi-Agent Architecture**: Hierarchical agent system with clear delegation patterns
-- 🧠 **Gemini LLM Integration**: Optional Google Gemini integration for intelligent routing
-- 📝 **Consistent Logging**: All agents use standardized logging format `[AgentName] message`
-- 🎯 **Task Routing**: Intelligent task classification and agent delegation
-- 💾 **Memory System**: Persistent storage of tasks, conversations, and context
-- 🎫 **Ticket Management**: Automated ticket creation and tracking
+## Setup
 
-## Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd MAESTRO
-```
-
-2. Install dependencies:
+1. **Install Dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables (optional):
+2. **Configure AWS Credentials**
 ```bash
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY if you want LLM-powered routing
+# Option 1: AWS CLI
+aws configure
+
+# Option 2: Environment Variables
+export AWS_ACCESS_KEY_ID="your-access-key"
+export AWS_SECRET_ACCESS_KEY="your-secret-key"
+export AWS_REGION="us-west-2"
 ```
+
+3. **Request Bedrock Model Access**
+- Go to AWS Console → Amazon Bedrock → Model access
+- Request access to Claude 3.5 Sonnet model
+- Wait for approval (usually immediate)
 
 ## Usage
 
-### Basic Demo
-
-Run the main demonstration to see the "Low Disk Space" scenario:
-
+Run the main application:
 ```bash
 python main.py
 ```
 
-This will show the complete agent interaction flow:
-1. Orchestrator receives "Low Disk Space" task
-2. Delegates to Memory Agent for task storage
-3. Routes to Ticket Agent for logging
-4. Delegates to Worker Agent for resolution
-5. Stores results back in Memory Agent
-
-### Expected Output
-
-```
-[Orchestrator] received task: Low Disk Space
-[Orchestrator] delegating to Memory Agent for task storage
-[Memory Agent] processing memory task: Low Disk Space
-[Memory Agent] memory stored: Type: task
-[Orchestrator] routing decision: System/infrastructure issue detected - routing to Ticket Agent for logging and Worker Agent for resolution
-[Orchestrator] delegating to Ticket Agent
-[Ticket Agent] processing ticket request: Low Disk Space
-[Ticket Agent] ticket logged successfully: ID: TICKET-0001
-[Orchestrator] delegating to Memory Agent for ticket logging
-[Memory Agent] processing memory task: Ticket created: TICKET-0001
-[Memory Agent] memory stored: Type: conversation
-[Orchestrator] delegating to Worker Agent stub
-[Generic Worker] processing task: Low Disk Space
-[Generic Worker] analyzing disk usage
-[Generic Worker] identifying cleanup opportunities
-[Generic Worker] task completed: Disk cleanup analysis performed
-[Orchestrator] task processing completed: Routed to 2 agents
+Test memory functionality:
+```bash
+python test_memory.py
 ```
 
-## Architecture
+The system will process tickets with memory integration:
+1. Orchestrator receives the raw ticket
+2. Routes to Memory Agent to check for similar past resolutions
+3. If no memory found, routes to appropriate specialized agent
+4. After resolution, stores the solution in memory for future use
 
-### Agent Hierarchy
+## Project Structure
 
 ```
-Orchestrator Agent (Main Controller)
-├── Memory Agent (Knowledge Storage)
-├── Ticket Agent (Issue Logging)
-└── Worker Agents (Task Execution)
-    └── Generic Worker (Default Implementation)
+MAESTRO/
+├── agents/                 # Agent implementations
+│   ├── orchestrator_agent.py
+│   ├── memory_agent.py     # Memory management with mem0
+│   ├── ticketing_agent.py
+│   ├── network_diagnostic_agent.py
+│   └── cloud_service_agent.py
+├── tools/                  # Diagnostic tools
+│   ├── network_tools.py
+│   └── cloud_tools.py
+├── schemas/                # Data schemas
+│   └── ticket_schema.py
+├── main.py                 # Main application
+├── test_memory.py          # Memory functionality test
+├── requirements.txt        # Dependencies
+└── README.md              # This file
 ```
 
-### Agent Communication Flow
+## Key Features
 
-1. **Task Reception**: Orchestrator receives external tasks
-2. **Memory Storage**: Task stored in Memory Agent for context
-3. **Routing Decision**: Orchestrator determines appropriate agents
-4. **Delegation**: Tasks routed to specialized agents
-5. **Result Aggregation**: Orchestrator collects and returns results
+- **Amazon Bedrock Integration**: Uses Claude 3.5 Sonnet for intelligent agent reasoning
+- **Memory Integration**: Persistent memory using mem0.ai for storing and retrieving past resolutions
+- **Autonomous Agent Handoffs**: Uses Strands Swarm pattern for intelligent coordination
+- **Network Diagnostics**: Real ping, traceroute, and DNS resolution tools
+- **Cloud Service Operations**: AWS service troubleshooting and management
+- **Structured Ticket Processing**: Converts raw tickets to standardized format
+- **Auto-Resolution**: Attempts to resolve issues using cached solutions first
+- **Escalation Path**: Provides detailed analysis for complex issues
 
-## Configuration
+## Memory Features
 
-### Environment Variables
+- **Store**: Save successful resolutions with semantic indexing
+- **Retrieve**: Find similar past issues using semantic search  
+- **List**: View all stored memories for audit and management
+- **Persistent**: Memories persist across sessions using mem0.ai
 
-- `GEMINI_API_KEY`: Google Gemini API key for LLM-powered routing (optional)
-- `DEBUG`: Enable debug logging (default: True)
-- `LOG_LEVEL`: Logging level (default: INFO)
+## Requirements
 
-### Agent Configuration
-
-Each agent can be customized through their constructors:
-
-```python
-from agents import OrchestratorAgent
-
-# Initialize with custom configuration
-orchestrator = OrchestratorAgent(
-    name="CustomOrchestrator",
-    llm_api_key="your-gemini-key"
-)
-```
-
-## Extending the System
-
-### Adding New Worker Agents
-
-1. Create a new agent class inheriting from `WorkerAgent`:
-
-```python
-from agents.worker_agent import WorkerAgent
-
-class CustomWorkerAgent(WorkerAgent):
-    def __init__(self, agent_id: str):
-        super().__init__(agent_id, "Custom Worker")
-    
-    def process_task(self, task: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
-        self.log_action("processing custom task", task)
-        # Your custom logic here
-        return {"status": "completed", "result": "Custom processing done"}
-```
-
-2. Register the agent in the Orchestrator's routing logic
-3. Update the `__init__.py` imports
-
-### Customizing Routing Logic
-
-Modify the `_determine_routing` method in `OrchestratorAgent` to add new routing rules:
-
-```python
-def _determine_routing(self, task: str) -> Dict[str, Any]:
-    # Add your custom routing logic
-    if "custom_keyword" in task.lower():
-        return {"agents": ["custom"], "reasoning": "Custom task detected"}
-    # ... existing logic
-```
-
-## Dependencies
-
-- `crewai==0.28.8`: Multi-agent framework
-- `google-generativeai==0.3.2`: Google Gemini LLM integration
-- `python-dotenv==1.0.0`: Environment variable management
-
-## License
-
-This project is part of the SuperHacks 2025 hackathon submission.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-MAESTRO - Multi-Agent Enterprise Service Transformation & Resolution Orchestrator
+- Python 3.8+
+- AWS Account with Bedrock access
+- AWS credentials configured
+- Network access for diagnostic commands (ping, traceroute, nslookup)
