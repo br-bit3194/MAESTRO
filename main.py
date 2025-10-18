@@ -1,106 +1,103 @@
-"""
-Main demonstration of the multi-agent system.
-Shows how the Orchestrator receives a "Low Disk Space" task and delegates it through the agent hierarchy.
-"""
+import logging
+from strands.multiagent import Swarm
+from agents.orchestrator_agent import create_orchestrator_agent
+from agents.memory_agent import create_memory_agent
+from agents.ticketing_agent import create_ticketing_agent
+from agents.network_diagnostic_agent import create_network_diagnostic_agent
+from agents.cloud_service_agent import create_cloud_service_agent
 
-import os
-from dotenv import load_dotenv
-from agents import OrchestratorAgent
+# Enable debug logging
+logging.getLogger("strands.multiagent").setLevel(logging.INFO)
+logging.basicConfig(
+    format="%(levelname)s | %(name)s | %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+
+def create_maestro_swarm():
+    """Create MAESTRO multi-agent swarm for IT operations."""
+    
+    # Create specialized agents
+    orchestrator = create_orchestrator_agent()
+    memory = create_memory_agent()
+    ticketing = create_ticketing_agent()
+    network_diagnostic = create_network_diagnostic_agent()
+    cloud_service = create_cloud_service_agent()
+    
+    # Create swarm with orchestrator as entry point
+    swarm = Swarm(
+        [orchestrator, memory, ticketing, network_diagnostic, cloud_service],
+        # entry_point=orchestrator,
+        max_handoffs=15,
+        max_iterations=20,
+        execution_timeout=540.0,  # 9 minutes
+        node_timeout=120.0,        # 2 minute per agent
+        repetitive_handoff_detection_window=4,
+        repetitive_handoff_min_unique_agents=2
+    )
+    
+    return swarm
+
+def run_maestro_workflow(ticket):
+    """Run MAESTRO workflow for a given ticket and return result."""
+    maestro = create_maestro_swarm()
+    result = maestro(ticket)
+    return result
 
 def main():
-    """Demonstrate the multi-agent system with a 'Low Disk Space' scenario."""
-    
-    # Load environment variables
-    load_dotenv()
-    
+    """Main function to run MAESTRO."""
+    print("🤖 MAESTRO - AI-Powered Multi-Agent IT Operations Platform")
     print("=" * 60)
-    print("MAESTRO Multi-Agent System Demonstration")
-    print("=" * 60)
-    print()
     
-    # Initialize the orchestrator
-    print("Initializing Orchestrator Agent...")
-    orchestrator = OrchestratorAgent(name="Orchestrator")
-    print()
+    # Create the swarm
+    maestro = create_maestro_swarm()
     
-    # Simulate receiving a "Low Disk Space" task
-    task = "Low Disk Space"
-    context = {
-        "priority": "high",
-        "source": "system_monitor",
-        "details": "Server disk usage at 95% capacity"
-    }
+    # Test cases
+    network_ticket = """
+    Network Connectivity Issue Report:
     
-    print(f"🚨 INCOMING TASK: '{task}'")
-    print(f"📋 Context: {context}")
-    print()
-    print("Agent Interaction Flow:")
-    print("-" * 40)
+    Problem: Users reporting slow response times when accessing google.com
+    Symptoms: Page loads taking 5-10 seconds, intermittent timeouts
+    Affected Service: Web browsing to external sites
+    Impact: Multiple users in office network
+    Reporter: Network Admin
+    Priority: Medium
     
-    # Process the task through the orchestrator
-    result = orchestrator.receive_task(task, context)
+    Please diagnose connectivity and routing to google.com
+    """
     
-    print()
-    print("-" * 40)
-    print("📊 FINAL RESULTS:")
-    print("-" * 40)
+    s3_ticket = """
+    I'm facing an issue where I cannot access 'demo-superop-bucket' in AWS account 'XXXXXXXXXX'
+    Error: Bucket not found or does not exist
+    Priority: High
     
-    # Display the results
-    print(f"✅ Task: {result['task']}")
-    print(f"🎯 Routing Decision: {result['routing_decision']['reasoning']}")
-    print(f"📝 Memory Storage: {result['memory_storage']['status']}")
-    print()
+    Please check if bucket exists and resolve access issue
+    """
     
-    print("🤖 Agent Results:")
-    for i, agent_result in enumerate(result['agent_results'], 1):
-        agent_name = agent_result['agent']
-        agent_data = agent_result['result']
+    # Choose which ticket to process
+    sample_ticket = s3_ticket  # Change to network_ticket for network issues
+    
+    print("Processing the ticket with Memory Integration...")
+    print(f"Ticket: {sample_ticket}")
+    print("\n" + "=" * 60)
+    
+    try:
+        # Execute the swarm
+        result = maestro(sample_ticket)
         
-        print(f"  {i}. {agent_name}:")
-        if agent_name == "TicketAgent":
-            print(f"     - Ticket ID: {agent_data.get('ticket_id', 'N/A')}")
-            print(f"     - Status: {agent_data.get('status', 'N/A')}")
-            print(f"     - Message: {agent_data.get('message', 'N/A')}")
-        elif agent_name == "GenericWorkerAgent":
-            print(f"     - Status: {agent_data.get('status', 'N/A')}")
-            print(f"     - Action: {agent_data.get('action_taken', 'N/A')}")
-            if 'recommendations' in agent_data:
-                print(f"     - Recommendations:")
-                for rec in agent_data['recommendations']:
-                    print(f"       • {rec}")
-        print()
-    
-    # Demonstrate memory retrieval
-    print("🧠 MEMORY SYSTEM DEMONSTRATION:")
-    print("-" * 40)
-    
-    # Retrieve recent tasks from memory
-    memory_result = orchestrator.memory_agent.process_task(
-        "recent tasks", 
-        {"operation": "retrieve", "type": "task", "limit": 3}
-    )
-    
-    print("Recent tasks in memory:")
-    for i, memory_entry in enumerate(memory_result['results'], 1):
-        print(f"  {i}. {memory_entry['content']} (Type: {memory_entry['type']})")
-    
-    print()
-    
-    # Retrieve conversation history
-    conversation_result = orchestrator.memory_agent.process_task(
-        "conversation history",
-        {"operation": "retrieve", "type": "conversation", "limit": 3}
-    )
-    
-    print("Recent conversation history:")
-    for i, conv_entry in enumerate(conversation_result['results'], 1):
-        print(f"  {i}. {conv_entry['content']} (Timestamp: {conv_entry['timestamp'][:19]})")
-    
-    print()
-    print("=" * 60)
-    print("✅ Multi-Agent System Demonstration Complete!")
-    print("=" * 60)
-
+        print(f"\n🎯 Resolution Status: {result.status}")
+        print(f"📊 Agents Involved: {[node.node_id for node in result.node_history]}")
+        print(f"⏱️  Total Execution Time: {result.execution_time}ms")
+        
+        # Print final result
+        if result.status.name == "COMPLETED":
+            print("\n✅ RESOLUTION COMPLETE")
+            print("=" * 60)
+            print("The ticket has been successfully processed and resolved by the MAESTRO agents.")
+        else:
+            print(f"\n❌ Resolution failed with status: {result.status.name}")
+            
+    except Exception as e:
+        print(f"❌ Error running MAESTRO: {str(e)}")
 
 if __name__ == "__main__":
     main()

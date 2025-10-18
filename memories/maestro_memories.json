@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "query": "AWS S3 bucket access issue - demo-superop-bucket not found",
+    "resolution": "The issue was a typo in bucket name. Correct bucket is 'demo-superops-bucket' (with 's')",
+    "timestamp": "2025-10-18T14:31:04.761001"
+  }
+]
