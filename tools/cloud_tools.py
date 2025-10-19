@@ -6,7 +6,7 @@ from strands.tools import tool
 def list_all_buckets():
     """List all S3 buckets in the AWS account"""
     try:
-        session = boto3.Session(profile_name='XXXXXXXXXX_AdministratorAccess')
+        session = boto3.Session(profile_name='superops')
         s3_client = session.client('s3')
         response = s3_client.list_buckets()
         buckets = [bucket['Name'] for bucket in response['Buckets']]
@@ -18,7 +18,7 @@ def list_all_buckets():
 def get_bucket_location(bucket_name: str):
     """Get the region location of an S3 bucket"""
     try:
-        session = boto3.Session(profile_name='XXXXXXXXXX_AdministratorAccess')
+        session = boto3.Session(profile_name='superops')
         s3_client = session.client('s3')
         response = s3_client.get_bucket_location(Bucket=bucket_name)
         region = response['LocationConstraint'] or 'us-east-1'
@@ -30,7 +30,7 @@ def get_bucket_location(bucket_name: str):
 def check_bucket_exists(bucket_name: str):
     """Check if an S3 bucket exists and is accessible"""
     try:
-        session = boto3.Session(profile_name='XXXXXXXXXX_AdministratorAccess')
+        session = boto3.Session(profile_name='superops_AdministratorAccess')
         s3_client = session.client('s3')
         s3_client.head_bucket(Bucket=bucket_name)
         return {'success': True, 'bucket': bucket_name, 'exists': True}
