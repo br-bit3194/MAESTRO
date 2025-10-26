@@ -21,7 +21,7 @@ def main():
     try:
         subprocess.run([
             sys.executable, "-m", "streamlit", "run", "maestro_ui_enhanced.py",
-            "--server.port", "8503",
+            "--server.port", "8507",
             "--server.address", "localhost"
         ])
     except KeyboardInterrupt:

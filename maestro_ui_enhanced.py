@@ -9,11 +9,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from io import BytesIO
 import base64
+import tempfile
 
+__file__ = "/Users/akashey/Documents/CEAT Learnings/Hackathon/Q_CLI/maestro_memories.json"
 # Add current directory to path
-sys.path.append(os.path.dirname(os.path.abspath(_file_)))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from main import run_maestro_workflow
+from multimodal_input import process_multimodal_input
 
 # Initialize session state
 if 'ticket_history' not in st.session_state:
@@ -25,7 +28,7 @@ if 'dark_mode' not in st.session_state:
 
 def load_memories():
     """Load memories from JSON file"""
-    memories_dir = os.path.join(os.path.dirname(os.path.abspath(_file_)), "memories")
+    memories_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "memories")
     memory_file = os.path.join(memories_dir, "maestro_memories.json")
     
     if os.path.exists(memory_file):
@@ -692,22 +695,111 @@ def main():
                 ticket_description = st.text_area(
                     "Describe your IT issue:",
                     placeholder="Example: I'm facing an issue where I cannot access 'demo-superop-bucket' in AWS account 'XXXXXXXXXX'",
-                    height=200
+                    height=150
+                )
+                
+                # Image upload section
+                st.subheader("📷 Upload Error Screenshots (Optional)")
+                uploaded_files = st.file_uploader(
+                    "Choose error screenshot(s)",
+                    type=['png', 'jpg', 'jpeg'],
+                    accept_multiple_files=True,
+                    help="Upload screenshots of error messages, system alerts, or any visual issues"
                 )
                 
                 submitted = st.form_submit_button("🚀 Process Ticket", use_container_width=True)
         
         with col2:
             st.header("🔄 Live Workflow Progress")
-            if submitted and ticket_description:
-                # Create ticket object
-                ticket = f"""
-                {ticket_description}
-                Priority: {priority}
+            if submitted and (ticket_description or uploaded_files):
+                # Process uploaded images
+                image_paths = []
+                if uploaded_files:
+                    st.subheader("📷 Uploaded Screenshots")
+                    
+                    # Create tabs for each image for better organization
+                    if len(uploaded_files) == 1:
+                        uploaded_file = uploaded_files[0]
+                        # Save uploaded file temporarily
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
+                            tmp_file.write(uploaded_file.getvalue())
+                            image_paths.append(tmp_file.name)
+                        
+                        # Display single image in full width with zoom capability
+                        st.image(
+                            uploaded_file, 
+                            caption=f"📸 {uploaded_file.name}",
+                            use_container_width=True
+                        )
+                        
+                        # Add expandable view for HD quality
+                        with st.expander("🔍 View in HD Quality", expanded=False):
+                            st.image(
+                                uploaded_file,
+                                caption=f"HD View: {uploaded_file.name}"
+                            )
+                            
+                    else:
+                        # Multiple images - use tabs
+                        tab_names = [f"Image {i+1}: {file.name[:20]}..." if len(file.name) > 20 else f"Image {i+1}: {file.name}" 
+                                    for i, file in enumerate(uploaded_files)]
+                        tabs = st.tabs(tab_names)
+                        
+                        for i, (uploaded_file, tab) in enumerate(zip(uploaded_files, tabs)):
+                            # Save uploaded file temporarily
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
+                                tmp_file.write(uploaded_file.getvalue())
+                                image_paths.append(tmp_file.name)
+                            
+                            with tab:
+                                # Display image with full width
+                                st.image(
+                                    uploaded_file, 
+                                    caption=f"📸 {uploaded_file.name}",
+                                    use_container_width=True
+                                )
+                                
+                                # File info
+                                st.caption(f"📊 File: {uploaded_file.name} | Size: {len(uploaded_file.getvalue())/1024:.1f} KB")
+                                
+                                # HD expandable view
+                                with st.expander("🔍 View in HD Quality", expanded=False):
+                                    st.image(
+                                        uploaded_file,
+                                        caption=f"HD View: {uploaded_file.name}"
+                                    )
+                    
+                    # Summary of uploaded images
+                    st.success(f"✅ {len(uploaded_files)} image(s) uploaded successfully")
                 
-                Please check and resolve this issue
-                """
-            
+                # Process multimodal input
+                try:
+                    if image_paths or ticket_description:
+                        # Store image info for results display
+                        if image_paths:
+                            st.session_state['last_ticket_images'] = []
+                            for i, (path, uploaded_file) in enumerate(zip(image_paths, uploaded_files)):
+                                st.session_state['last_ticket_images'].append((uploaded_file.name, "Processing..."))
+                        
+                        combined_ticket = process_multimodal_input(
+                            text_input=ticket_description,
+                            image_paths=image_paths if image_paths else None
+                        )
+                        
+                        # Create final ticket
+                        ticket = f"""
+                        {combined_ticket}
+                        Priority: {priority}
+                        
+                        Please check and resolve this issue
+                        """
+                    else:
+                        st.error("Please provide either a text description or upload an image")
+                        st.stop()
+                        
+                except Exception as e:
+                    st.error(f"Error processing input: {str(e)}")
+                    st.stop()
                 
                 # Progress tracking
                 progress_container = st.container()
@@ -725,6 +817,19 @@ def main():
                     # Show workflow steps
                     step1.write("🔍 1. Checking memory for similar issues...")
                     time.sleep(0.5)
+                    
+                    # Show image analysis progress if images were uploaded
+                    if image_paths:
+                        step1.write("🔍 1. Memory check + 🖼️ Analyzing uploaded images...")
+                        
+                        # Show image analysis progress
+                        image_progress = st.empty()
+                        for i, uploaded_file in enumerate(uploaded_files):
+                            image_progress.write(f"📸 Analyzing image {i+1}/{len(uploaded_files)}: {uploaded_file.name}")
+                            time.sleep(0.3)
+                        image_progress.write("✅ Image analysis completed")
+                    else:
+                        step1.write("✅ 1. Memory check completed")
                     
                     step2.write("📋 2. Analyzing ticket structure...")
                     time.sleep(0.5)
@@ -753,11 +858,25 @@ def main():
                         
                         st.success("🎉 Workflow completed successfully!")
                         
+                        # Cleanup temporary files
+                        for path in image_paths:
+                            try:
+                                os.unlink(path)
+                            except:
+                                pass
+                        
                     except Exception as e:
                         st.error(f"❌ Error: {str(e)}")
                         step5.write("❌ 5. Workflow failed")
+                        
+                        # Cleanup temporary files
+                        for path in image_paths:
+                            try:
+                                os.unlink(path)
+                            except:
+                                pass
             else:
-                st.info("👆 Submit a ticket to see live progress")
+                st.info("👆 Submit a ticket with text description and/or error screenshots to see live progress")
         
         with col3:
             st.header("📊 Results & Analysis")
@@ -788,6 +907,30 @@ def main():
                 
                 # Final resolution
                 st.subheader("🎯 Final Resolution")
+                
+                # Show image analysis if images were processed
+                if 'last_ticket_images' in st.session_state and st.session_state['last_ticket_images']:
+                    st.subheader("🖼️ Image Analysis Results")
+                    
+                    # Create downloadable report
+                    analysis_report = "# Image Analysis Report\n\n"
+                    
+                    for i, (image_name, analysis) in enumerate(st.session_state['last_ticket_images']):
+                        analysis_report += f"## Image {i+1}: {image_name}\n\n{analysis}\n\n---\n\n"
+                        
+                        with st.expander(f"📸 Analysis for {image_name}", expanded=True):
+                            st.markdown(analysis)
+                    
+                    # Download button for analysis report
+                    st.download_button(
+                        label="📥 Download Image Analysis Report",
+                        data=analysis_report,
+                        file_name=f"image_analysis_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+                        mime="text/markdown"
+                    )
+                    
+                    st.markdown("---")
+                
                 if hasattr(result, 'node_history') and result.node_history:
                     # Get the last meaningful result
                     for node in reversed(result.node_history):
@@ -821,5 +964,5 @@ def main():
     elif page == "📤 Export Data":
         export_data()
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
