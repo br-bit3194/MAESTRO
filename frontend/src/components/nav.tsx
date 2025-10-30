@@ -8,7 +8,7 @@ export function MainNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Home', href: '/' }
+    { name: 'Home', href: '/home' }
   ];
 
   return (
