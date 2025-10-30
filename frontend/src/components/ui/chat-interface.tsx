@@ -40,12 +40,22 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tickets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: input,
+          priority: 'Low',
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      const data: any = await response.json();
       const botResponse: Message = {
         role: 'assistant',
-        content: `This is a simulated response to: ${input}`,
+        content: data.message,
         timestamp: new Date().toISOString(),
       };
       
