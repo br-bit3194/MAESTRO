@@ -16,7 +16,7 @@ export default function HomeLayout() {
   const handleViewChange = (view: string) => {
     setActiveView(view as ActiveView);
   };
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);

@@ -29,7 +29,7 @@ export default function Home() {
                 </Link>
               </Button>
               <Button variant="outline" asChild className="gap-2">
-                <a href="https://github.com/yourusername/maestro" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/br-bit3194/MAESTRO.git" target="_blank" rel="noopener noreferrer">
                   <Github className="w-4 h-4" /> GitHub
                 </a>
               </Button>
