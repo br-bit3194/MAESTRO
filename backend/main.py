@@ -8,7 +8,11 @@ from datetime import datetime
 import os
 from pathlib import Path
 
+from maestro_swarm import run_maestro_workflow, create_maestro_swarm
+
 app = FastAPI(title="MAESTRO API", version="1.0.0")
+
+maestro_agent = create_maestro_swarm()
 
 # CORS middleware configuration
 app.add_middleware(
@@ -82,54 +86,44 @@ async def get_ticket(ticket_id: str):
 async def process_ticket(ticket_id: str):
     """Process a ticket using the MAESTRO workflow"""
     # Find the ticket
-    ticket = None
-    for t in tickets_db:
-        if t["id"] == ticket_id:
-            ticket = t
-            break
+    ticket = next((t for t in tickets_db if t["id"] == ticket_id), None)
     
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     
     try:
-        # Here you would call your MAESTRO workflow
-        # result = run_maestro_workflow(ticket["description"])
+        # Get the raw result from the maestro agent
+        raw_result = maestro_agent(ticket["description"])
         
-        # For now, we'll simulate processing
-        import time
-        time.sleep(2)
-        
+        # Convert the result to a serializable format
+        if hasattr(raw_result, 'to_dict'):
+            result = raw_result.to_dict()
+        elif hasattr(raw_result, 'dict'):
+            result = raw_result.dict()
+        elif hasattr(raw_result, '__dict__'):
+            result = {k: v for k, v in raw_result.__dict__.items() 
+                     if not k.startswith('_') and not callable(v)}
+        else:
+            result = str(raw_result)
+            
         # Update ticket status
-        ticket["status"] = "In Progress"
-        
-        # Simulate some processing steps
-        steps = [
-            "🔍 Checking memory for similar issues...",
-            "📋 Analyzing ticket structure...",
-            "🛠️ Routing to appropriate agent...",
-            "⚡ Executing diagnostic/resolution...",
-            "💾 Storing resolution in memory..."
-        ]
-        
-        for step in steps:
-            time.sleep(0.5)
-            print(step)
-        
-        # Mark as resolved
-        ticket["status"] = "Resolved"
-        ticket["resolved_at"] = datetime.utcnow().isoformat()
-        
-        # Save to memory
-        save_to_memory(ticket)
+        ticket["status"] = "Processed"
+        ticket["processed_at"] = datetime.utcnow().isoformat()
         
         return {
             "status": "success",
-            "message": "Ticket processed successfully",
-            "ticket_id": ticket_id
+            "ticket_id": ticket_id,
+            "result": result
         }
+
     except Exception as e:
-        ticket["status"] = "Error"
-        raise HTTPException(status_code=500, detail=str(e))
+        if ticket:
+            ticket["status"] = "Error"
+            ticket["error"] = str(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing ticket: {str(e)}"
+        )
 
 def save_to_memory(ticket: dict):
     """Save resolution to memory file"""
