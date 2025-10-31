@@ -11,7 +11,10 @@ import { LoadingPopup } from '@/components/ui/loading-popup';
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
-  content: string;
+  content: string | {
+    ticketDetails?: Array<{ label: string; value: string }>;
+    response?: string;
+  };
   timestamp: string;
   isTyping?: boolean;
   error?: boolean;
@@ -187,13 +190,41 @@ export function ChatInterface() {
 
       const processData = await response.json();
       
-      // Update the typing message with the final response
+      // Parse the response and extract ticket details and response message
+      const ticketingAgentResult = processData.result?.results?.ticketing_agent?.result;
+      const orchestratorResult = processData.result?.results?.orchestrator_agent?.result;
+      
+      let content = {
+        ticketDetails: [] as Array<{label: string, value: string}>,
+        response: ''
+      };
+
+      // Extract ticket details from the response
+      if (ticketingAgentResult?.ticket) {
+        const ticket = ticketingAgentResult.ticket;
+        content.ticketDetails = [
+          { label: 'Ticket ID', value: ticket.id || 'N/A' },
+          { label: 'Status', value: ticket.status || 'Open' },
+          { label: 'Priority', value: ticket.priority || 'Medium' },
+          { label: 'Created At', value: ticket.created_at || new Date().toLocaleString() },
+        ];
+      }
+
+      // Extract response message
+      if (ticketingAgentResult?.message?.content?.[0]?.text) {
+        content.response = ticketingAgentResult.message.content[0].text;
+      } else if (orchestratorResult?.message?.content?.[0]?.text) {
+        content.response = orchestratorResult.message.content[0].text;
+      } else {
+        content.response = 'Received an unexpected response format from the server.';
+      }
+      
       setMessages(prev =>
         prev.map(msg =>
           msg.id === typingMessageId
             ? {
                 ...msg,
-                content: processData.message || 'Your request has been processed successfully.',
+                content: content,
                 isTyping: false,
               }
             : msg
@@ -246,7 +277,7 @@ export function ChatInterface() {
   };
 
   const handleRetry = (message: Message) => {
-    if (message.role === 'user') {
+    if (message.role === 'user' && typeof message.content === 'string') {
       const userInput = message.content;
       setMessages(prev => prev.filter(m => m.id !== message.id));
       handleSend(userInput);
@@ -363,11 +394,37 @@ export function ChatInterface() {
                       <TypingIndicator />
                     ) : message.error ? (
                       <ErrorMessage 
-                        message={message.content} 
+                        message={typeof message.content === 'string' ? message.content : 'An error occurred'} 
                         onRetry={() => handleRetry(message)}
                       />
+                    ) : message.role === 'assistant' && typeof message.content !== 'string' ? (
+                      <div className="space-y-3">
+                        {message.content.ticketDetails && message.content.ticketDetails.length > 0 && (
+                          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Ticket Details</h3>
+                            <div className="space-y-2 text-sm">
+                              {message.content.ticketDetails.map((detail, index) => (
+                                <div key={index} className="grid grid-cols-3 gap-2">
+                                  <span className="text-gray-500 dark:text-gray-400">{detail.label}:</span>
+                                  <span className="col-span-2 font-medium text-gray-900 dark:text-white">{detail.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {message.content.response && (
+                          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900 p-4">
+                            <h3 className="font-semibold text-lg mb-2 text-blue-700 dark:text-blue-300">Response</h3>
+                            <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+                              {message.content.response}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      <div className="whitespace-pre-wrap">{message.content}</div>
+                      <div className="whitespace-pre-wrap">
+                        {typeof message.content === 'string' ? message.content : 'Unsupported message format'}
+                      </div>
                     )}
                     <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                       {new Date(message.timestamp).toLocaleTimeString()}

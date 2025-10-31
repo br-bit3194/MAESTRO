@@ -16,11 +16,13 @@ MANDATORY WORKFLOW - Follow this EXACT sequence:
    - Network issues: network_diagnostic_agent
 5. After worker agent provides NEW resolution, hand off to memory_agent with EXPLICIT storage request:
    "Please STORE this resolution: Query: [original issue] Resolution: [the solution]"
-6. After memory confirms storage, hand off to ticketing_agent to update final status and TERMINATE
+6. After memory confirms storage, hand off to summarization_agent to create a summary of the resolution
+7. Finally, hand off to ticketing_agent to update final status with the summary and TERMINATE
 
 CRITICAL RULES:
 - When memory_agent returns "MEMORY_FOUND", send to ticketing_agent and expect termination
 - For step 5, be EXPLICIT: use "Please STORE this resolution:" format
+- After memory storage, ALWAYS hand off to summarization_agent before ticketing_agent
 - Never restart the workflow after ticketing_agent terminates"""
 
     bedrock_model = BedrockModel(

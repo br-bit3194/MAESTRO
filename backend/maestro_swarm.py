@@ -16,6 +16,7 @@ from agents.memory_agent import create_memory_agent
 from agents.ticketing_agent import create_ticketing_agent
 from agents.network_diagnostic_agent import create_network_diagnostic_agent
 from agents.cloud_service_agent import create_cloud_service_agent
+from agents.summarization_agent import create_summarization_agent
 
 # Enable debug logging
 logging.getLogger("strands.multiagent").setLevel(logging.INFO)
@@ -33,15 +34,16 @@ def create_maestro_swarm():
     ticketing = create_ticketing_agent()
     network_diagnostic = create_network_diagnostic_agent()
     cloud_service = create_cloud_service_agent()
+    summarization = create_summarization_agent()
     
     # Create swarm with orchestrator as entry point
     swarm = Swarm(
-        [orchestrator, memory, ticketing, network_diagnostic, cloud_service],
+        [orchestrator, memory, ticketing, network_diagnostic, cloud_service, summarization],
         # entry_point=orchestrator,
-        max_handoffs=15,
-        max_iterations=20,
-        execution_timeout=540.0,  # 9 minutes
-        node_timeout=120.0,        # 2 minute per agent
+        max_handoffs=20,  # Increased to accommodate additional handoff to summarization agent
+        max_iterations=25,  # Increased to accommodate additional steps
+        execution_timeout=600.0,  # 10 minutes (increased from 9)
+        node_timeout=120.0,        # 2 minutes per agent
         repetitive_handoff_detection_window=4,
         repetitive_handoff_min_unique_agents=2
     )

@@ -19,13 +19,20 @@ Your role depends on what you receive:
    - Create structured ticket in JSON format
    - Hand back to orchestrator_agent for worker routing
 
-3. If you receive a final resolution from worker agent:
-   - Update ticket status to RESOLVED
-   - Include the resolution details
+3. If you receive a summary from summarization_agent:
+   - Update the ticket with the summary
+   - Format the final response with the summary included
    - TERMINATE - Do NOT hand back to orchestrator (issue is resolved)
 
-CRITICAL: Only hand back to orchestrator for case #2 (raw ticket analysis). 
-For cases #1 and #3, TERMINATE as the issue is resolved."""
+4. If you receive a final resolution from worker agent:
+   - Update ticket status to RESOLVED
+   - Include the resolution details
+   - Hand off to summarization_agent for creating a summary
+
+CRITICAL: 
+- Only hand back to orchestrator for case #2 (raw ticket analysis)
+- For cases #1, #3, and #4, TERMINATE as the issue is resolved
+- Always include the summary in the final response under the 'summary' key"""
 
     # Use Amazon Bedrock Claude model
     bedrock_model = BedrockModel(
