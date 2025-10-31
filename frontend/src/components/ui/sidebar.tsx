@@ -240,7 +240,6 @@ interface SidebarProps {
 
 export function SidebarDemo({ activeView, onViewChange, open: isOpen, isHovered, setOpen }: SidebarProps) {
   const links = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5 flex-shrink-0" /> },
     { id: 'chat', label: 'Chat', icon: <MessageSquare className="h-5 w-5 flex-shrink-0" /> },
     { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="h-5 w-5 flex-shrink-0" /> },
     { id: 'submit-ticket', label: 'Submit Ticket', icon: <PlusCircle className="h-5 w-5 flex-shrink-0" /> },

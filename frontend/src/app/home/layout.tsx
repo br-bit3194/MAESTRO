@@ -9,10 +9,10 @@ import { SubmitTicket } from "@/components/ui/submit-ticket";
 import { MemoryExplorer } from "@/components/ui/memory-explorer";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export type ActiveView = 'dashboard' | 'chat' | 'analytics' | 'submit-ticket' | 'memory-explorer' | 'export';
+export type ActiveView = 'chat' | 'analytics' | 'submit-ticket' | 'memory-explorer' | 'export';
 
 export default function HomeLayout() {
-  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
+  const [activeView, setActiveView] = useState<ActiveView>('chat');
   const handleViewChange = (view: string) => {
     setActiveView(view as ActiveView);
   };
@@ -38,8 +38,6 @@ export default function HomeLayout() {
 
   const renderContent = () => {
     switch (activeView) {
-      case 'dashboard':
-        return <DashboardMetrics />;
       case 'chat':
         return <ChatInterface />;
       case 'analytics':
