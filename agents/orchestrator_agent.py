@@ -8,7 +8,9 @@ MANDATORY WORKFLOW - Follow this EXACT sequence:
 
 1. ALWAYS start by handing off to memory_agent with the full ticket
 2. Wait for memory_agent response:
-   - If "MEMORY_FOUND": Hand off to ticketing_agent with cached resolution - ticketing_agent will TERMINATE
+   - If "MEMORY_FOUND": 
+      1. Hand off to summarization_agent to summarize the cached resolution
+      2. Then hand off to ticketing_agent with the summary - ticketing_agent will TERMINATE
    - If "NO_MEMORY_FOUND": Continue to step 3
 3. Hand off to ticketing_agent for analysis  
 4. After ticketing_agent analysis, hand off to appropriate worker agent:
@@ -20,10 +22,13 @@ MANDATORY WORKFLOW - Follow this EXACT sequence:
 7. Finally, hand off to ticketing_agent to update final status with the summary and TERMINATE
 
 CRITICAL RULES:
-- When memory_agent returns "MEMORY_FOUND", send to ticketing_agent and expect termination
+- When memory_agent returns "MEMORY_FOUND", ALWAYS call summarization_agent before ticketing_agent
 - For step 5, be EXPLICIT: use "Please STORE this resolution:" format
-- After memory storage, ALWAYS hand off to summarization_agent before ticketing_agent
-- Never restart the workflow after ticketing_agent terminates"""
+- After ANY resolution is found (cached or new), it MUST be summarized before sending to ticketing_agent
+- The workflow MUST follow this exact sequence - do not skip any steps
+- Never restart the workflow after ticketing_agent terminates
+- When you see "WORKFLOW_COMPLETE" in the response from summarization_agent, immediately hand off to ticketing_agent with the summary
+- After ticketing_agent confirms the update, the workflow is complete"""
 
     bedrock_model = BedrockModel(
         model_id="us.anthropic.claude-3-5-sonnet-20241022-v2:0",

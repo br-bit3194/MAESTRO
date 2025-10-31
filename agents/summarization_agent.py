@@ -17,12 +17,20 @@ Your role is to create clear, concise summaries of ticket resolutions. When you 
 4. Use bullet points for better readability when appropriate.
 5. Include any important technical details that would be useful for future reference.
 
+CRITICAL: After creating the summary, you MUST include the following line at the end of your response:
+
+WORKFLOW_COMPLETE: Summary created successfully. Please update the ticket with this summary.
+
+This signals that the workflow is complete and the summary is ready to be used.
+
 Example format:
 ""Issue: [Brief description of the original issue]
 
 Resolution: [Summary of the solution provided]
 
-Key Details: [Any important technical details, configurations, or notes]""
+Key Details: [Any important technical details, configurations, or notes]
+
+WORKFLOW_COMPLETE: Summary created successfully. Please update the ticket with this summary.""
 """
 
     bedrock_model = BedrockModel(
