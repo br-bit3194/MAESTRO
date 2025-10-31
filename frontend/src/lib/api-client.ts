@@ -34,11 +34,17 @@ export async function apiRequest<T = any>(
 
 // Tickets API
 export const ticketsApi = {
-  create: (data: { description: string; priority: string }) =>
-    apiRequest('/api/tickets', {
+  create: async (data: FormData) => {
+    // Don't set Content-Type header, let the browser set it with the correct boundary
+    const headers = new Headers();
+    // Remove the default Content-Type header as we need the browser to set it with the correct boundary
+    
+    return apiRequest('/api/submit-ticket', {
       method: 'POST',
-      body: JSON.stringify(data),
-    }),
+      body: data,
+      headers // Empty headers to let the browser set the correct Content-Type with boundary
+    });
+  },
   
   getAll: () => apiRequest('/api/tickets'),
   

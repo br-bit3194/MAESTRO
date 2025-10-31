@@ -199,7 +199,10 @@ export function ChatInterface() {
         response: ''
       };
 
-      // Extract ticket details from the response
+      // Get the summarization agent's response if available
+      const summarizationAgentResult = processData.result?.results?.summarization_agent?.result;
+      
+      // Extract ticket details from the response if available
       if (ticketingAgentResult?.ticket) {
         const ticket = ticketingAgentResult.ticket;
         content.ticketDetails = [
@@ -210,13 +213,15 @@ export function ChatInterface() {
         ];
       }
 
-      // Extract response message
-      if (ticketingAgentResult?.message?.content?.[0]?.text) {
+      // Use summarization agent's response if available, otherwise fall back to other responses
+      if (summarizationAgentResult?.message?.content?.[0]?.text) {
+        content.response = summarizationAgentResult.message.content[0].text;
+      } else if (ticketingAgentResult?.message?.content?.[0]?.text) {
         content.response = ticketingAgentResult.message.content[0].text;
       } else if (orchestratorResult?.message?.content?.[0]?.text) {
         content.response = orchestratorResult.message.content[0].text;
       } else {
-        content.response = 'Received an unexpected response format from the server.';
+        content.response = 'Processing your request. Please wait...';
       }
       
       setMessages(prev =>

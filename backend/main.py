@@ -1,16 +1,21 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, UploadFile, File, Form, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union, Annotated
 import uvicorn
 import json
 from datetime import datetime, timezone
 import os
 from pathlib import Path
 import uuid
+import shutil
+import asyncio
 
 from maestro_swarm import run_maestro_workflow, create_maestro_swarm
 from dynamodb_utils import db_manager
+from image_utils import process_uploaded_images, analyze_image, cleanup_temp_files
+from multimodal_input import process_multimodal_input
 
 app = FastAPI(title="MAESTRO API", version="1.0.0")
 
@@ -25,20 +30,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ensure memories directory exists
+# Ensure necessary directories exist
 os.makedirs("memories", exist_ok=True)
+os.makedirs("uploads", exist_ok=True)
 
 # Path for memory file
 MEMORY_FILE = "memories/maestro_memories.json"
 os.makedirs(os.path.dirname(MEMORY_FILE), exist_ok=True)
 
+# Mount static files for serving uploaded files
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 class TicketBase(BaseModel):
     description: str
     priority: str = "Medium"
     timestamp: Optional[str] = None
+    attachments: Optional[List[Dict[str, str]]] = []
 
 class TicketCreate(TicketBase):
-    pass
+    title: Optional[str] = None
+    description: str
+    priority: str = "Medium"
+    category: str = "other"
+    attachments: List[Dict[str, str]] = []
 
 class Ticket(TicketBase):
     ticket_id: str = Field(..., alias="id")  # Maps id to ticket_id for API responses
@@ -58,11 +72,16 @@ async def create_ticket(ticket: TicketCreate):
     
     new_ticket = {
         'ticket_id': ticket_id,
+        'title': getattr(ticket, 'title', 'No Title'),
         'description': ticket.description,
+        'original_description': getattr(ticket, 'original_description', ticket.description),
         'priority': ticket.priority,
+        'category': getattr(ticket, 'category', 'other'),
         'status': 'Open',
         'created_at': now,
-        'timestamp': ticket.timestamp or now
+        'updated_at': now,
+        'timestamp': getattr(ticket, 'timestamp', now),
+        'attachments': getattr(ticket, 'attachments', [])
     }
     
     # Save to DynamoDB
@@ -180,6 +199,161 @@ def save_to_memory(ticket: dict):
             
     except Exception as e:
         print(f"Error saving to memory: {e}")
+
+async def save_uploaded_file(file: UploadFile) -> Dict[str, Any]:
+    """Save an uploaded file and return its metadata"""
+    # Create uploads directory if it doesn't exist
+    os.makedirs("uploads", exist_ok=True)
+    
+    # Generate unique filename
+    file_ext = os.path.splitext(file.filename)[1] if file.filename else '.bin'
+    file_name = f"{uuid.uuid4()}{file_ext}"
+    file_path = os.path.join("uploads", file_name)
+    
+    try:
+        # Save file in binary mode
+        with open(file_path, "wb") as buffer:
+            # Read file in chunks to handle large files
+            while content := await file.read(1024 * 1024):  # 1MB chunks
+                buffer.write(content)
+        
+        return {
+            "filename": file.filename or "unnamed_file",
+            "file_path": f"/uploads/{file_name}",
+            "saved_path": file_path,
+            "content_type": file.content_type or "application/octet-stream",
+            "size": os.path.getsize(file_path)
+        }
+    except Exception as e:
+        # Clean up if there was an error
+        if os.path.exists(file_path):
+            try:
+                os.unlink(file_path)
+            except:
+                pass
+        raise e
+
+async def process_ticket_async(ticket_id: str, ticket_data: Dict[str, Any]):
+    """Process ticket asynchronously in the background"""
+    try:
+        # Update ticket status to processing
+        db_manager.update_ticket(ticket_id, {'status': 'Processing'})
+        
+        # Here you can add more processing logic if needed
+        # For now, we'll just mark it as completed after a short delay
+        await asyncio.sleep(2)
+        
+        db_manager.update_ticket(ticket_id, {
+            'status': 'Processed',
+            'processed_at': datetime.now(timezone.utc).isoformat()
+        })
+    except Exception as e:
+        print(f"Error in background processing for ticket {ticket_id}: {str(e)}")
+        db_manager.update_ticket(ticket_id, {
+            'status': 'Error',
+            'error': str(e)
+        })
+
+@app.post("/api/submit-ticket")
+async def submit_ticket(
+    title: str = Form(...),
+    description: str = Form(...),
+    priority: str = Form("medium"),
+    category: str = Form("other"),
+    files: List[UploadFile] = File([]),
+    background_tasks: BackgroundTasks = BackgroundTasks()
+):
+    """
+    Submit a new ticket with form data and optional file attachments.
+    Processes the input using multimodal analysis if files are provided.
+    
+    Args:
+        title: Title of the ticket
+        description: Detailed description of the issue
+        priority: Priority level (low, medium, high, critical)
+        category: Category of the issue (network, storage, compute, security, other)
+        files: Optional list of uploaded files
+        
+    Returns:
+        Dictionary containing the created ticket data, status, and analysis results
+    """
+    try:
+        # Process file uploads if any
+        processed_files = []
+        image_paths = []
+        
+        if files:
+            for file in files:
+                try:
+                    file_meta = await save_uploaded_file(file)
+                    processed_files.append(file_meta)
+                except Exception as e:
+                    print(f"Error saving file {file.filename}: {str(e)}")
+                    continue
+        
+        # Generate a unique ticket ID
+        ticket_id = str(uuid.uuid4())
+        created_at = datetime.now(timezone.utc).isoformat()
+        
+        # Process with multimodal input if files are provided
+        processed_description = description
+        try:
+            if processed_files:
+                # Pass both text and image paths to multimodal processing
+                image_paths = [f['saved_path'] for f in processed_files if f.get('saved_path')]
+                if image_paths:  # Only process if we have valid image paths
+                    processed_description = await process_multimodal_input(description, image_paths)
+        except Exception as e:
+            print(f"Error in multimodal processing: {str(e)}")
+            # Fall back to original description if processing fails
+
+        # Create ticket data with required ticket_id and timestamps
+        ticket_data = {
+            'ticket_id': ticket_id,  # Add the ticket_id here
+            'title': title,
+            'description': processed_description,
+            'original_description': description,  # Save original user input
+            'priority': priority,
+            'category': category,
+            'status': 'Open',
+            'created_at': created_at,
+            'updated_at': created_at,  # Add updated_at timestamp
+            'attachments': [{
+                'filename': f['filename'],
+                'content_type': f['content_type'],
+                'size': f['size'],
+                'file_path': f['file_path']
+            } for f in processed_files]
+        }
+
+        # Save to database
+        ticket = db_manager.create_ticket(ticket_data)
+        
+        # Trigger background processing if needed
+        if processed_files:
+            background_tasks.add_task(process_ticket_async, ticket['ticket_id'], ticket_data)
+
+        return {
+            "status": "success",
+            "message": "Ticket submitted successfully",
+            "ticket_id": ticket['ticket_id'],
+            "data": ticket
+        }
+
+    except Exception as e:
+        # Clean up any uploaded files if there was an error
+        if 'processed_files' in locals():
+            for file_meta in processed_files:
+                if 'saved_path' in file_meta and os.path.exists(file_meta['saved_path']):
+                    try:
+                        os.unlink(file_meta['saved_path'])
+                    except:
+                        pass
+        
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error submitting ticket: {str(e)}"
+        )
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

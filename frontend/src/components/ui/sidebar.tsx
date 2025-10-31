@@ -253,10 +253,10 @@ interface SidebarProps {
 export function SidebarDemo({ activeView, onViewChange, open: isOpen, isHovered, setOpen }: SidebarProps) {
   const links = [
     { id: 'chat', label: 'Chat', icon: <MessageSquare className="h-5 w-5 flex-shrink-0" /> },
-    { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="h-5 w-5 flex-shrink-0" /> },
+    // { id: 'analytics', label: 'Analytics', icon: <BarChart2 className="h-5 w-5 flex-shrink-0" /> },
     { id: 'submit-ticket', label: 'Submit Ticket', icon: <PlusCircle className="h-5 w-5 flex-shrink-0" /> },
-    { id: 'memory-explorer', label: 'Memory Explorer', icon: <Brain className="h-5 w-5 flex-shrink-0" /> },
-    { id: 'export', label: 'Export Data', icon: <Download className="h-5 w-5 flex-shrink-0" /> },
+    // { id: 'memory-explorer', label: 'Memory Explorer', icon: <Brain className="h-5 w-5 flex-shrink-0" /> },
+    // { id: 'export', label: 'Export Data', icon: <Download className="h-5 w-5 flex-shrink-0" /> },
   ];
   
   const handleLinkClick = (e: React.MouseEvent, id: string) => {

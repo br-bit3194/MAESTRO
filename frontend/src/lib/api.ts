@@ -75,6 +75,12 @@ export const ticketApi = {
   getAllTickets: () => api.get(config.api.endpoints.tickets.base),
   getTicketById: (id: string) => api.get(config.api.endpoints.tickets.byId(id)),
   createTicket: (ticketData: any) => api.post(config.api.endpoints.tickets.base, ticketData),
+  submitTicket: (formData: FormData) => 
+    api.post('/api/submit-ticket', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
   updateTicket: (id: string, ticketData: any) => 
     api.put(config.api.endpoints.tickets.byId(id), ticketData),
   deleteTicket: (id: string) => api.delete(config.api.endpoints.tickets.byId(id)),

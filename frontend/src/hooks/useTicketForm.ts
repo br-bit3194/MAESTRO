@@ -6,12 +6,12 @@ export const useTicketForm = () => {
   const [error, setError] = useState<string | null>(null);
   const [ticket, setTicket] = useState<any>(null);
 
-  const submitTicket = async (data: { description: string; priority: string }) => {
+  const submitTicket = async (formData: FormData) => {
     setIsSubmitting(true);
     setError(null);
     
     try {
-      const { data: newTicket, error } = await ticketsApi.create(data);
+      const { data: newTicket, error } = await ticketsApi.create(formData);
       
       if (error) {
         throw new Error(error);
@@ -19,10 +19,12 @@ export const useTicketForm = () => {
       
       setTicket(newTicket);
       return newTicket;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to submit ticket';
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.error || 
+                         err?.message || 
+                         'Failed to submit ticket';
       setError(errorMessage);
-      throw err;
+      throw new Error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
