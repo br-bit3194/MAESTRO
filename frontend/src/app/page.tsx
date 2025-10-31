@@ -16,9 +16,18 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Text Content */}
           <div className="space-y-8 text-center lg:text-left">
-            <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-400">
-              MAESTRO
-            </h1>
+            <div className="flex flex-col items-center lg:items-start space-y-4">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-blue-400/30 p-1">
+                <img 
+                  src="/logo.jpeg" 
+                  alt="MAESTRO Logo" 
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+              <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-400">
+                MAESTRO
+              </h1>
+            </div>
             <p className="text-xl text-gray-300 max-w-2xl">
               AI-powered IT Operations Platform that automates incident resolution with intelligent agent workflows.
             </p>

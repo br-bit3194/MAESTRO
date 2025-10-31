@@ -203,13 +203,19 @@ const Logo = () => {
   return (
     <Link
       href="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      className="font-normal flex items-center space-x-3 text-sm py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+        <img 
+          src="/logo.jpeg" 
+          alt="MAESTRO Logo" 
+          className="w-full h-full object-cover"
+        />
+      </div>
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium text-black dark:text-white whitespace-pre"
+        className="font-medium text-black dark:text-white whitespace-pre text-lg"
       >
         MAESTRO
       </motion.span>
@@ -221,9 +227,15 @@ const LogoIcon = () => {
   return (
     <Link
       href="#"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      className="flex items-center justify-center p-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <div className="w-8 h-8 rounded-full overflow-hidden">
+        <img 
+          src="/logo.jpeg" 
+          alt="MAESTRO" 
+          className="w-full h-full object-cover"
+        />
+      </div>
     </Link>
   );
 };

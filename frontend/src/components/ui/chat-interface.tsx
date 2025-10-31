@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bot, Download, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import { PromptBox } from '@/components/ui/chatgpt-prompt-input';
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { LoadingPopup } from '@/components/ui/loading-popup';
 
 interface Message {
   id: string;
@@ -43,8 +45,11 @@ const ErrorMessage = ({ message, onRetry }: { message: string; onRetry: () => vo
 );
 
 export function ChatInterface() {
+  // State for loading popup
+  const [showLoading, setShowLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const processingMessageId = useRef<string | null>(null);
 
@@ -57,6 +62,7 @@ export function ChatInterface() {
   ];
 
   const handleSend = async (input: string, retryCount = 0) => {
+    setShowLoading(true);
     if (!input.trim()) return;
 
     const messageId = `msg-${Date.now()}`;
@@ -69,6 +75,8 @@ export function ChatInterface() {
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+    setIsProcessing(true);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling while loading
 
     try {
       // Add typing indicator
@@ -152,14 +160,18 @@ export function ChatInterface() {
       });
     } finally {
       processingMessageId.current = null;
-      if (retryCount >= MAX_RETRIES - 1) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
+      setShowLoading(false);
     }
   };
 
   const processTicket = async (ticketId: string, typingMessageId: string) => {
+    setShowLoading(true);
+    setIsProcessing(true);
     try {
+      // Show loading popup before making the API call
+      setIsProcessing(true);
+      
       const response = await fetchWithRetry(
         `${process.env.NEXT_PUBLIC_API_URL}/api/process-ticket/${ticketId}`,
         { 
@@ -191,6 +203,7 @@ export function ChatInterface() {
       return true;
     } catch (error) {
       console.error('Error processing ticket:', error);
+      setIsProcessing(false);
       setMessages(prev =>
         prev.map(msg =>
           msg.id === typingMessageId
@@ -207,6 +220,8 @@ export function ChatInterface() {
     } finally {
       // Ensure loading state is always reset
       setIsLoading(false);
+      setShowLoading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -265,94 +280,117 @@ export function ChatInterface() {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      const input = e.currentTarget.value.trim();
+      if (input) {
+        handleSend(input);
+        e.currentTarget.value = '';
+      }
     }
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">💬 Chat with MAESTRO</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportChat}>
-            <Download className="h-4 w-4 mr-2" />
-            Export Chat
-          </Button>
-          <Button variant="outline" size="sm" onClick={clearChat}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Clear Chat
-          </Button>
-        </div>
-      </div>
+    <div className="relative flex flex-col h-full">
+      {/* Loading Overlay with Dotted Surface */}
+      <LoadingOverlay show={isProcessing} text="Processing your request..." />
 
-      <div className="flex-1 flex flex-col h-full max-h-[calc(100vh-200px)] overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-            <Bot className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-2xl font-bold tracking-tight">How can I help you today?</h3>
-            <p className="text-muted-foreground mt-2">Ask me anything about your infrastructure or system issues.</p>
-            
-            <div className="mt-8 w-full max-w-md">
-              <h4 className="text-sm font-medium mb-3 text-muted-foreground">Or try one of these examples:</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {quickPrompts.map((prompt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSend(prompt.prompt)}
-                    className="p-3 text-left text-sm border rounded-lg hover:bg-accent transition-colors"
-                  >
-                    {prompt.label}
-                  </button>
-                ))}
+      <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden">
+                <img 
+                  src="/logo.jpeg" 
+                  alt="MAESTRO Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
+              <span className="text-lg font-semibold">Chat with MAESTRO</span>
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={exportChat}>
+                <Download className="h-4 w-4 mr-2" />
+                Export Chat
+              </Button>
+              <Button variant="outline" size="sm" onClick={clearChat}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Clear Chat
+              </Button>
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                    message.error
-                      ? 'bg-destructive/10 border border-destructive/20'
-                      : message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
-                  {message.isTyping ? (
-                    <TypingIndicator />
-                  ) : message.error ? (
-                    <ErrorMessage 
-                      message={message.content} 
-                      onRetry={() => handleRetry(message)}
-                    />
-                  ) : (
-                    <div className="whitespace-pre-wrap">{message.content}</div>
-                  )}
-                  <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                    {new Date(message.timestamp).toLocaleTimeString()}
-                  </div>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <div className="text-center">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full overflow-hidden border-2 border-blue-400/30 p-1 animate-bounce">
+                  <img 
+                    src="/logo.jpeg" 
+                    alt="MAESTRO Logo" 
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                </div>
+                <h4 className="text-sm font-medium mb-3 text-muted-foreground">Try one of these examples:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {quickPrompts.map((prompt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(prompt.prompt)}
+                      className="p-3 text-left text-sm border rounded-lg hover:bg-accent transition-colors w-full"
+                    >
+                      {prompt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ))}
-            <div ref={messagesEndRef} />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                      message.error
+                        ? 'bg-destructive/10 border border-destructive/20'
+                        : message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                    }`}
+                  >
+                    {message.isTyping ? (
+                      <TypingIndicator />
+                    ) : message.error ? (
+                      <ErrorMessage 
+                        message={message.content} 
+                        onRetry={() => handleRetry(message)}
+                      />
+                    ) : (
+                      <div className="whitespace-pre-wrap">{message.content}</div>
+                    )}
+                    <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="border-t p-4">
+          <div className="w-full">
+            <PromptBox 
+              onSend={handleSend}
+              isLoading={isLoading}
+              className="w-full"
+              disabled={isLoading}
+              placeholder="Type your message here..."
+            />
           </div>
-        )}
-      </div>
-
-      <div className="p-4">
-        <PromptBox 
-          onSend={handleSend}
-          isLoading={isLoading}
-          className="w-full"
-          disabled={isLoading}
-          placeholder="Type your message here..."
-        />
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
