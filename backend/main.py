@@ -4,11 +4,13 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import uvicorn
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from pathlib import Path
+import uuid
 
 from maestro_swarm import run_maestro_workflow, create_maestro_swarm
+from dynamodb_utils import db_manager
 
 app = FastAPI(title="MAESTRO API", version="1.0.0")
 
@@ -26,10 +28,8 @@ app.add_middleware(
 # Ensure memories directory exists
 os.makedirs("memories", exist_ok=True)
 
-# In-memory storage for tickets (replace with a database in production)
-tickets_db = []
+# Path for memory file
 MEMORY_FILE = "memories/maestro_memories.json"
-
 os.makedirs(os.path.dirname(MEMORY_FILE), exist_ok=True)
 
 class TicketBase(BaseModel):
@@ -41,131 +41,73 @@ class TicketCreate(TicketBase):
     pass
 
 class Ticket(TicketBase):
-    id: str
+    ticket_id: str = Field(..., alias="id")  # Maps id to ticket_id for API responses
     status: str = "Open"
     created_at: str
     resolved_at: Optional[str] = None
     
     class Config:
         from_attributes = True
+        populate_by_name = True  # Allow both id and ticket_id in input data
 
 @app.post("/api/tickets", response_model=Ticket)
 async def create_ticket(ticket: TicketCreate):
-    """Create a new ticket"""
-    ticket_id = f"TKT-{len(tickets_db) + 1:04d}"
-    now = datetime.utcnow().isoformat()
+    """Create a new ticket in DynamoDB"""
+    ticket_id = f"TKT-{str(uuid.uuid4())}"
+    now = datetime.now(timezone.utc).isoformat()
     
-    new_ticket = Ticket(
-        id=ticket_id,
-        description=ticket.description,
-        priority=ticket.priority,
-        created_at=now,
-        timestamp=ticket.timestamp or now
-    )
+    new_ticket = {
+        'ticket_id': ticket_id,
+        'description': ticket.description,
+        'priority': ticket.priority,
+        'status': 'Open',
+        'created_at': now,
+        'timestamp': ticket.timestamp or now
+    }
     
-    tickets_db.append(new_ticket.dict())
-    
-    # Here you would typically call your MAESTRO workflow
-    # For now, we'll just return the created ticket
-    return new_ticket
+    # Save to DynamoDB
+    try:
+        db_manager.create_ticket(new_ticket)
+        return Ticket(**new_ticket)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create ticket: {str(e)}"
+        )
 
 @app.get("/api/tickets", response_model=List[Ticket])
 async def list_tickets():
-    """List all tickets"""
-    return tickets_db
+    """List all tickets from DynamoDB"""
+    try:
+        tickets = db_manager.list_tickets()
+        # Convert DynamoDB items to Ticket models
+        return [Ticket(**ticket) for ticket in tickets]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve tickets: {str(e)}"
+        )
 
 @app.get("/api/tickets/{ticket_id}", response_model=Ticket)
 async def get_ticket(ticket_id: str):
-    """Get a specific ticket by ID"""
-    for ticket in tickets_db:
-        if ticket["id"] == ticket_id:
-            return ticket
-    raise HTTPException(status_code=404, detail="Ticket not found")
+    """Get a specific ticket by ID from DynamoDB"""
+    ticket = db_manager.get_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    return Ticket(**ticket)
 
 @app.post("/api/process-ticket/{ticket_id}")
 async def process_ticket(ticket_id: str):
     """Process a ticket using the MAESTRO workflow"""
-    # Find the ticket
-    ticket = next((t for t in tickets_db if t["id"] == ticket_id), None)
-    
+    # Get the ticket from DynamoDB
+    ticket = db_manager.get_ticket(ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     
     try:
         # Get the raw result from the maestro agent
-        import time
-        time.sleep(5)
-        return {
-            "status": "success",
-            "ticket_id": "TKT-0003",
-            "result": {
-                "type": "multiagent_result",
-                "status": "completed",
-                "results": {
-                    "orchestrator_agent": {
-                        "result": {
-                            "type": "agent_result",
-                            "message": {
-                                "role": "assistant",
-                                "content": [
-                                    {
-                                        "text": "Since this is a cached resolution and I've handed off to ticketing_agent, the workflow will terminate here as per the rules."
-                                    }
-                                ]
-                            },
-                            "stop_reason": "end_turn"
-                        },
-                        "execution_time": 10016,
-                        "status": "completed",
-                        "accumulated_usage": {
-                            "inputTokens": 17862,
-                            "outputTokens": 2046,
-                            "totalTokens": 19908
-                        },
-                        "accumulated_metrics": {
-                            "latencyMs": 49980
-                        },
-                        "execution_count": 1
-                    },
-                    "ticketing_agent": {
-                        "result": {
-                            "type": "agent_result",
-                            "message": {
-                                "role": "assistant",
-                                "content": [
-                                    {
-                                        "text": "I'll process this as Case #1 since we received a cached resolution (MEMORY_FOUND) for the S3 bucket access issue.\n\nBased on the shared knowledge, I'll create a structured ticket with the cached resolution:\n\nTicket Details:\n{\n    \"ticket_id\": \"S3-ACCESS-\" + timestamp,\n    \"issue_type\": \"s3_access\",\n    \"priority\": \"medium\",\n    \"status\": \"RESOLVED\",\n    \"description\": \"User cannot access S3 bucket\",\n    \"root_cause\": \"Incorrect bucket name reference\",\n    \"resolution\": {\n        \"type\": \"bucket_name_correction\",\n        \"details\": \"Issue resolved by providing correct S3 bucket name: 'demo-superops-bucket'\",\n        \"action_taken\": \"Verified and provided correct bucket name from cache\",\n        \"correct_bucket\": \"demo-superops-bucket\"\n    },\n    \"resolution_source\": \"cache\"\n}\n\nResponse to user:\nYour S3 bucket access issue has been resolved. The correct bucket name to use is 'demo-superops-bucket'. Please ensure you're using this exact bucket name in your access attempts. If you continue to experience issues with the correct bucket name, please submit a new ticket.\n\nSince this is Case #1 with a cached resolution, I will TERMINATE here without handing back to the orchestrator as the issue is resolved."
-                                    }
-                                ]
-                            },
-                            "stop_reason": "end_turn"
-                        },
-                        "execution_time": 7178,
-                        "status": "completed",
-                        "accumulated_usage": {
-                            "inputTokens": 3125,
-                            "outputTokens": 992,
-                            "totalTokens": 4117
-                        },
-                        "accumulated_metrics": {
-                            "latencyMs": 23030
-                        },
-                        "execution_count": 1
-                    }
-                },
-                "accumulated_usage": {
-                    "inputTokens": 20987,
-                    "outputTokens": 3038,
-                    "totalTokens": 24025
-                },
-                "accumulated_metrics": {
-                    "latencyMs": 73010
-                },
-                "execution_count": 2,
-                "execution_time": 17193
-            }
-        }
         raw_result = maestro_agent(ticket["description"])
+        
         
         # Convert the result to a serializable format
         if hasattr(raw_result, 'to_dict'):
@@ -178,10 +120,20 @@ async def process_ticket(ticket_id: str):
         else:
             result = str(raw_result)
             
-        # Update ticket status
-        ticket["status"] = "Processed"
-        ticket["processed_at"] = datetime.utcnow().isoformat()
+        # Update ticket status in DynamoDB
+        update_data = {
+            'status': 'Processed',
+            'processed_at': datetime.now(timezone.utc).isoformat(),
+            'result': result
+        }
+        updated_ticket = db_manager.update_ticket(ticket_id, update_data)
         
+        if not updated_ticket:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update ticket status"
+            )
+            
         return {
             "status": "success",
             "ticket_id": ticket_id,
@@ -189,9 +141,13 @@ async def process_ticket(ticket_id: str):
         }
 
     except Exception as e:
+        # Update ticket status to Error in DynamoDB
         if ticket:
-            ticket["status"] = "Error"
-            ticket["error"] = str(e)
+            db_manager.update_ticket(ticket_id, {
+                'status': 'Error',
+                'error': str(e),
+                'processed_at': datetime.now(timezone.utc).isoformat()
+            })
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing ticket: {str(e)}"
@@ -202,10 +158,10 @@ def save_to_memory(ticket: dict):
     try:
         memory_entry = {
             "query": ticket["description"],
-            "resolution": f"Ticket {ticket['id']} resolved",
-            "timestamp": datetime.utcnow().isoformat(),
-            "ticket_id": ticket["id"],
-            "priority": ticket["priority"]
+            "resolution": f"Ticket {ticket['ticket_id']} resolved",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "ticket_id": ticket["ticket_id"],
+            "priority": ticket.get("priority", "Medium")
         }
         
         # Load existing memories
