@@ -185,24 +185,78 @@ export function ChatInterface() {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to process ticket');
+        // Try to get error details from the response
+        let errorMessage = 'Failed to process ticket';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorData.message || errorData.error || errorMessage;
+        } catch (e) {
+          // If parsing JSON fails, use status text
+          errorMessage = `Failed to process ticket: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const processData = await response.json();
       
-      // Parse the response and extract ticket details and response message
-      const ticketingAgentResult = processData.result?.results?.ticketing_agent?.result;
-      const orchestratorResult = processData.result?.results?.orchestrator_agent?.result;
+      // 🔍 COMPREHENSIVE LOGGING - Log everything from backend
+      console.log('='.repeat(60));
+      console.log('🔍 BACKEND RESPONSE - FULL DATA');
+      console.log('='.repeat(60));
+      console.log('1. Full processData:', JSON.stringify(processData, null, 2));
+      console.log('\n2. processData keys:', Object.keys(processData));
+      console.log('\n3. processData.result:', processData.result);
+      console.log('\n4. processData.result type:', typeof processData.result);
+      
+      const ticketResult = processData.result || {};
+      console.log('\n5. ticketResult:', ticketResult);
+      console.log('\n6. ticketResult keys:', Object.keys(ticketResult));
+      
+      const results = ticketResult.results || {};
+      console.log('\n7. results:', results);
+      console.log('\n8. results keys:', Object.keys(results));
+      
+      const nodeHistory = ticketResult.node_history || [];
+      console.log('\n9. nodeHistory length:', nodeHistory.length);
+      console.log('\n10. nodeHistory:', nodeHistory);
+      
+      if (nodeHistory.length > 0) {
+        console.log('\n11. Sample node (first):', nodeHistory[0]);
+        console.log('\n12. Sample node (last):', nodeHistory[nodeHistory.length - 1]);
+        
+        // Log each node in detail
+        nodeHistory.forEach((node, index) => {
+          console.log(`\n13.${index} Node ${index}:`, {
+            node_id: node.node_id,
+            status: node.status,
+            execution_time: node.execution_time,
+            result: node.result,
+            hasResult: !!node.result
+          });
+        });
+      }
+      
+      // Log all agent results
+      console.log('\n14. All Agent Results:');
+      Object.entries(results).forEach(([agentName, agentData]: [string, any]) => {
+        console.log(`\n   Agent: ${agentName}`);
+        console.log(`   - Has result:`, !!agentData?.result);
+        console.log(`   - Result:`, agentData?.result);
+        console.log(`   - Message:`, agentData?.result?.message);
+        console.log(`   - Content:`, agentData?.result?.message?.content);
+      });
+      
+      console.log('\n' + '='.repeat(60));
+      console.log('END OF BACKEND RESPONSE LOGGING');
+      console.log('='.repeat(60) + '\n');
       
       let content = {
         ticketDetails: [] as Array<{label: string, value: string}>,
         response: ''
       };
-
-      // Get the summarization agent's response if available
-      const summarizationAgentResult = processData.result?.results?.summarization_agent?.result;
       
-      // Extract ticket details from the response if available
+      // Extract ticket details from the ticketing agent if available
+      const ticketingAgentResult = results.ticketing_agent?.result;
       if (ticketingAgentResult?.ticket) {
         const ticket = ticketingAgentResult.ticket;
         content.ticketDetails = [
@@ -213,16 +267,168 @@ export function ChatInterface() {
         ];
       }
 
-      // Use summarization agent's response if available, otherwise fall back to other responses
-      if (summarizationAgentResult?.message?.content?.[0]?.text) {
-        content.response = summarizationAgentResult.message.content[0].text;
-      } else if (ticketingAgentResult?.message?.content?.[0]?.text) {
-        content.response = ticketingAgentResult.message.content[0].text;
-      } else if (orchestratorResult?.message?.content?.[0]?.text) {
-        content.response = orchestratorResult.message.content[0].text;
-      } else {
-        content.response = 'Processing your request. Please wait...';
+      // 🔧 PARSER: Extract text from Python string representations
+      // The backend returns Python object string representations like:
+      // "NodeResult(result=AgentResult(..., message={'content': [{'text': '...'}]}))"
+      // We need to parse these strings to extract the actual text
+      
+      const extractTextFromPythonStr = (pythonStr: string): string | null => {
+        if (!pythonStr || typeof pythonStr !== 'string') return null;
+        
+        console.log(`  🔍 Parsing string of length: ${pythonStr.length}`);
+        
+        // Strategy 1: Look for message={'content': [{'text': '...'
+        // Replace newlines to handle multiline matching
+        const singleLine = pythonStr.replace(/\n/g, ' ');
+        const pattern1 = /message=\{[^}]*'content':\s*\[\{[^}]*'text':\s*'((?:[^'\\]|\\.)*)'/;
+        let match = singleLine.match(pattern1);
+        
+        if (match && match[1]) {
+          console.log(`  ✅ Found text using pattern 1 (length: ${match[1].length})`);
+          return match[1]
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\'/g, "'")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\');
+        }
+        
+        // Strategy 2: Look for 'text': 'content' with more flexible matching
+        const pattern2 = /'text':\s*'((?:[^'\\]|\\.)+)'/;
+        match = singleLine.match(pattern2);
+        
+        if (match && match[1] && match[1].length > 20) {
+          console.log(`  ✅ Found text using pattern 2 (length: ${match[1].length})`);
+          return match[1]
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\'/g, "'")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\');
+        }
+        
+        // Strategy 3: Look for any long text content in quotes (500+ chars = likely resolution)
+        const pattern3 = /'([^']{500,})'/;
+        match = singleLine.match(pattern3);
+        
+        if (match && match[1]) {
+          console.log(`  ✅ Found long text using pattern 3 (length: ${match[1].length})`);
+          return match[1]
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\'/g, "'")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\');
+        }
+        
+        console.log(`  ❌ No text pattern matched`);
+        return null;
+      };
+      
+      // Extract the final resolution using the same logic as maestro_ui_enhanced.py
+      // Iterate through node_history in reverse to find the last meaningful result
+      let finalResolution = '';
+      
+      console.log('🔄 Starting resolution extraction...');
+      console.log('📋 Node history:', nodeHistory);
+      
+      if (nodeHistory && nodeHistory.length > 0) {
+        console.log(`\n🔍 Checking ${nodeHistory.length} nodes in reverse order...`);
+        
+        // Reverse iterate through node history
+        for (let i = nodeHistory.length - 1; i >= 0; i--) {
+          const nodeName = typeof nodeHistory[i] === 'string' ? nodeHistory[i] : nodeHistory[i].node_id;
+          console.log(`\n  📌 Node ${i}: ${nodeName}`);
+          
+          // Get the agent's result string from the results object
+          const agentResultStr = results[nodeName];
+          
+          if (agentResultStr && typeof agentResultStr === 'string') {
+            console.log(`  ✅ Found result string for ${nodeName}`);
+            const extractedText = extractTextFromPythonStr(agentResultStr);
+            
+            if (extractedText && extractedText.trim().length > 30) {
+              finalResolution = extractedText.trim();
+              console.log(`\n  ✨ SUCCESS! Extracted ${extractedText.length} chars from ${nodeName}`);
+              console.log(`  📝 Preview: ${finalResolution.substring(0, 150)}...`);
+              break;
+            }
+          } else {
+            console.log(`  ⚠️ No result string for ${nodeName}`);
+          }
+        }
       }
+      
+      // If no resolution found in node history, try specific agents in priority order
+      if (!finalResolution) {
+        console.log('\n🔄 Node history search failed, trying priority agents...');
+        
+        const agentPriority = [
+          'summarization_agent',  // Best: contains final summary
+          'ticketing_agent',      // Good: contains resolution details and ticket info
+          'cloud_service_agent',  // Specific: cloud-related resolutions
+          'network_diagnostic_agent', // Specific: network-related resolutions
+          'memory_agent',         // May have cached resolutions
+          'orchestrator_agent'    // Last resort: coordination messages
+        ];
+        
+        for (const agentName of agentPriority) {
+          const agentResultStr = results[agentName];
+          
+          if (agentResultStr && typeof agentResultStr === 'string') {
+            console.log(`\n  📌 Trying ${agentName}...`);
+            const extractedText = extractTextFromPythonStr(agentResultStr);
+            
+            if (extractedText && extractedText.trim().length > 30) {
+              finalResolution = extractedText.trim();
+              console.log(`  ✨ SUCCESS! Using ${agentName} response`);
+              break;
+            }
+          }
+        }
+      }
+      
+      // Last resort: check all agents
+      if (!finalResolution) {
+        console.log('\n🔄 Priority search failed, checking ALL agents...');
+        
+        for (const [agentName, agentResultStr] of Object.entries(results)) {
+          if (typeof agentResultStr === 'string') {
+            console.log(`\n  📌 Trying ${agentName}...`);
+            const extractedText = extractTextFromPythonStr(agentResultStr);
+            
+            if (extractedText && extractedText.trim().length > 30) {
+              finalResolution = extractedText.trim();
+              console.log(`  ✨ SUCCESS! Using ${agentName} (fallback)`);
+              break;
+            }
+          }
+        }
+      }
+      
+      // If still no resolution found, show generic message
+      if (!finalResolution) {
+        console.error('\n❌❌❌ FAILED TO EXTRACT RESOLUTION ❌❌❌');
+        console.error('📋 Results structure:', results);
+        const sampleResult = Object.values(results)[0];
+        if (typeof sampleResult === 'string') {
+          console.error('📋 Sample result:', sampleResult.substring(0, 500));
+        }
+        console.error('💡 TIP: Check the console logs above for parsing details');
+        
+        finalResolution = '✅ Ticket has been processed successfully.\n\n' +
+                         '⚠️ However, we could not extract the detailed resolution text.\n\n' +
+                         '🔍 Debug Information:\n' +
+                         `• Agents involved: ${Object.keys(results).join(', ')}\n` +
+                         `• Node history: ${nodeHistory.join(' → ')}\n\n` +
+                         '💡 Please open the browser console (F12 → Console tab) to see detailed logs and the full backend response.';
+      } else {
+        console.log('\n✅✅✅ RESOLUTION EXTRACTED SUCCESSFULLY! ✅✅✅');
+        console.log(`📝 Length: ${finalResolution.length} characters`);
+        console.log(`📝 Preview:\n${finalResolution.substring(0, 200)}...`);
+      }
+      
+      content.response = finalResolution;
       
       setMessages(prev =>
         prev.map(msg =>
@@ -239,13 +445,14 @@ export function ChatInterface() {
       return true;
     } catch (error) {
       console.error('Error processing ticket:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       setIsProcessing(false);
       setMessages(prev =>
         prev.map(msg =>
           msg.id === typingMessageId
             ? {
                 ...msg,
-                content: 'Error processing your request. Please try again.',
+                content: `❌ Error: ${errorMessage}\n\nPlease check:\n• Backend server is running\n• AWS credentials are configured\n• Network connectivity`,
                 isTyping: false,
                 error: true,
               }
