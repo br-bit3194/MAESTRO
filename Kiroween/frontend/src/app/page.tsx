@@ -1,0 +1,326 @@
+'use client';
+
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { 
+  FloatingGhosts, 
+  Bats, 
+  SpiderWeb, 
+  Fog 
+} from '@/components/effects';
+import {
+  GhostOrchestrator,
+  SkeletonMemory,
+  VampireTicketing,
+  WitchNetwork,
+  ReaperCloud,
+  MummySummarization
+} from '@/components/agents';
+
+export default function Home() {
+  return (
+    <>
+      <a href="#main-content" className="skip-to-main">
+        Skip to main content
+      </a>
+      <main id="main-content" className="min-h-screen bg-gradient-haunted relative overflow-hidden" role="main">
+      {/* Atmospheric Effects - Reduced on mobile for performance */}
+      <SpiderWeb corner="top-left" aria-hidden="true" />
+      <SpiderWeb corner="top-right" aria-hidden="true" />
+      <div className="hidden sm:block" aria-hidden="true">
+        <FloatingGhosts count={5} />
+        <Bats count={8} />
+      </div>
+      <div className="sm:hidden" aria-hidden="true">
+        <FloatingGhosts count={3} />
+        <Bats count={4} />
+      </div>
+      <Fog aria-hidden="true" />
+      
+      {/* Blood Moon Background */}
+      <div className="absolute top-10 right-10 sm:top-20 sm:right-20 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blood-red rounded-full opacity-20 blur-3xl" aria-hidden="true" />
+      
+      {/* Hero Section */}
+      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" aria-labelledby="hero-title">
+        <motion.div
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="text-center mb-12"
+        >
+          <motion.h1
+            id="hero-title"
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-creepster text-pumpkin-orange mb-6 drop-shadow-[0_0_30px_rgba(255,117,24,0.5)]"
+            animate={{ 
+              textShadow: [
+                "0 0 30px rgba(255,117,24,0.5)",
+                "0 0 50px rgba(255,117,24,0.8)",
+                "0 0 30px rgba(255,117,24,0.5)"
+              ]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            MAESTRO
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-spectral-green font-creepster mb-8 sm:mb-12 px-4"
+          >
+            Where IT Nightmares Come to Die
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center px-4"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            <Link href="/demo">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-blood-moon text-bone-white font-creepster text-lg sm:text-xl rounded-lg shadow-lg hover:shadow-blood-red/50 transition-shadow focus:outline-none focus:ring-4 focus:ring-pumpkin-orange/50"
+                aria-label="Enter the Crypt - Go to demo page"
+              >
+                🎃 Enter the Crypt
+              </motion.button>
+            </Link>
+            
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-bg-tombstone border-2 border-phantom-purple text-phantom-purple font-creepster text-lg sm:text-xl rounded-lg hover:bg-phantom-purple/20 transition-colors focus:outline-none focus:ring-4 focus:ring-phantom-purple/50"
+                aria-label="View Grimoire - Open GitHub repository in new tab"
+              >
+                📖 View Grimoire
+              </motion.button>
+            </a>
+          </motion.div>
+        </motion.div>
+      </section>
+      
+      {/* Feature Cards Section */}
+      <section className="relative z-10 py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8" aria-labelledby="features-title">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+          className="max-w-6xl mx-auto"
+        >
+          <h2 id="features-title" className="text-3xl sm:text-4xl md:text-5xl font-creepster text-pumpkin-orange text-center mb-8 sm:mb-12 md:mb-16">
+            Supernatural Powers
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* AI Possession */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-bg-crypt border-2 border-spectral-green rounded-lg p-6 sm:p-8 hover:border-pumpkin-orange transition-colors focus-within:ring-4 focus-within:ring-spectral-green/50"
+              role="article"
+              aria-labelledby="feature-ai-possession"
+            >
+              <div className="text-5xl sm:text-6xl mb-4 text-center" aria-hidden="true">👻</div>
+              <h3 id="feature-ai-possession" className="text-xl sm:text-2xl font-creepster text-spectral-green mb-3 sm:mb-4 text-center">
+                AI Possession
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray text-center">
+                Six specialized AI agents possess your IT infrastructure, 
+                diagnosing and resolving issues with supernatural intelligence.
+              </p>
+            </motion.div>
+            
+            {/* Spectral Swarm */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-bg-crypt border-2 border-phantom-purple rounded-lg p-6 sm:p-8 hover:border-pumpkin-orange transition-colors focus-within:ring-4 focus-within:ring-phantom-purple/50"
+              role="article"
+              aria-labelledby="feature-spectral-swarm"
+            >
+              <div className="text-5xl sm:text-6xl mb-4 text-center" aria-hidden="true">🕸️</div>
+              <h3 id="feature-spectral-swarm" className="text-xl sm:text-2xl font-creepster text-phantom-purple mb-3 sm:mb-4 text-center">
+                Spectral Swarm
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray text-center">
+                Agents collaborate through ethereal handoffs, orchestrating 
+                complex workflows that would haunt traditional automation.
+              </p>
+            </motion.div>
+            
+            {/* Eternal Memory */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-bg-crypt border-2 border-blood-red rounded-lg p-6 sm:p-8 hover:border-pumpkin-orange transition-colors focus-within:ring-4 focus-within:ring-blood-red/50"
+              role="article"
+              aria-labelledby="feature-eternal-memory"
+            >
+              <div className="text-5xl sm:text-6xl mb-4 text-center" aria-hidden="true">🔮</div>
+              <h3 id="feature-eternal-memory" className="text-xl sm:text-2xl font-creepster text-blood-red mb-3 sm:mb-4 text-center">
+                Eternal Memory
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray text-center">
+                Past resolutions are stored in the crypt's memory, allowing 
+                instant resurrection of solutions for recurring nightmares.
+              </p>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+      
+      {/* Agent Showcase Section */}
+      <section className="relative z-10 py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 md:mb-20" aria-labelledby="agents-title">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+          className="max-w-7xl mx-auto"
+        >
+          <h2 id="agents-title" className="text-3xl sm:text-4xl md:text-5xl font-creepster text-pumpkin-orange text-center mb-8 sm:mb-12 md:mb-16">
+            Meet the Coven
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 md:gap-12">
+            {/* Ghost Orchestrator */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+              role="article"
+              aria-labelledby="agent-orchestrator"
+            >
+              <div className="mb-6" aria-hidden="true">
+                <GhostOrchestrator isActive={true} />
+              </div>
+              <h3 id="agent-orchestrator" className="text-xl sm:text-2xl font-creepster text-spectral-green mb-2 sm:mb-3">
+                Ghost Orchestrator
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                The ethereal conductor who routes tickets through the spectral workflow, 
+                ensuring each spirit performs its haunting duty.
+              </p>
+            </motion.div>
+            
+            {/* Skeleton Memory */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-6">
+                <SkeletonMemory isActive={true} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-creepster text-bone-white mb-2 sm:mb-3">
+                Skeleton Memory
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                The keeper of ancient knowledge, storing past resolutions in glowing orbs 
+                and retrieving them from the crypt's eternal archives.
+              </p>
+            </motion.div>
+            
+            {/* Vampire Ticketing */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-6">
+                <VampireTicketing isActive={true} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-creepster text-blood-red mb-2 sm:mb-3">
+                Vampire Ticketing
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                The immortal processor who analyzes tickets, updates their status, 
+                and drains the life from unresolved issues.
+              </p>
+            </motion.div>
+            
+            {/* Witch Network */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-6">
+                <WitchNetwork isActive={true} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-creepster text-phantom-purple mb-2 sm:mb-3">
+                Witch Network
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                The network sorceress who peers into her crystal ball to diagnose 
+                connectivity curses and DNS hexes.
+              </p>
+            </motion.div>
+            
+            {/* Reaper Cloud */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-6">
+                <ReaperCloud isActive={true} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-creepster text-cobweb-gray mb-2 sm:mb-3">
+                Reaper Cloud
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                Death himself handles AWS operations, wielding his cloud-shaped scythe 
+                to harvest S3 bucket diagnostics.
+              </p>
+            </motion.div>
+            
+            {/* Mummy Summarization */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center"
+            >
+              <div className="mb-6">
+                <MummySummarization isActive={true} />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-creepster text-pumpkin-orange mb-2 sm:mb-3">
+                Mummy Summarization
+              </h3>
+              <p className="text-sm sm:text-base text-cobweb-gray">
+                The ancient scribe who unwraps complex resolutions into concise 
+                TL;DR summaries preserved for eternity.
+              </p>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+    </main>
+    </>
+  );
+}
