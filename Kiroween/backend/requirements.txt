@@ -1,4 +1,4 @@
-# MAESTRO Backend FastAPI Dependencies
+# Haunted Helpdesk Backend FastAPI Dependencies
 fastapi>=0.68.0
 uvicorn[standard]>=0.15.0
 pydantic>=2.0.0

@@ -169,7 +169,7 @@ export default function Home() {
             transition={{ duration: 2, repeat: Infinity }}
           >
             <span className="relative inline-block">
-              MAESTRO
+              Haunted Helpdesk
               {/* Glitch layers */}
               <motion.span
                 className="absolute top-0 left-0 text-blood-red opacity-70"
@@ -189,7 +189,7 @@ export default function Home() {
                 }}
                 aria-hidden="true"
               >
-                MAESTRO
+                Haunted Helpdesk
               </motion.span>
               <motion.span
                 className="absolute top-0 left-0 text-spectral-green opacity-70"
@@ -210,7 +210,7 @@ export default function Home() {
                 }}
                 aria-hidden="true"
               >
-                MAESTRO
+                Haunted Helpdesk
               </motion.span>
             </span>
           </motion.h1>

@@ -1,7 +1,7 @@
 # Multipart Ticket Submission Endpoint Implementation
 
 ## Overview
-Successfully implemented the `/api/submit-ticket` endpoint for the MAESTRO AI-powered IT operations platform. This endpoint enables users to submit tickets with text descriptions and optional error screenshots through multipart form data.
+Successfully implemented the `/api/submit-ticket` endpoint for the Haunted Helpdesk AI-powered IT operations platform. This endpoint enables users to submit tickets with text descriptions and optional error screenshots through multipart form data.
 
 ## Implementation Details
 
@@ -48,7 +48,7 @@ Successfully implemented the `/api/submit-ticket` endpoint for the MAESTRO AI-po
 ### 4. Background Workflow Processing
 - **Async Execution**: Uses FastAPI BackgroundTasks to process tickets asynchronously
 - **Non-Blocking**: Returns immediately with ticket_id while workflow runs in background
-- **Swarm Integration**: Initializes MAESTRO swarm and executes complete workflow
+- **Swarm Integration**: Initializes Haunted Helpdesk swarm and executes complete workflow
 - **Error Recovery**: Updates ticket status to "error" if workflow fails
 
 ### 5. Error Handling

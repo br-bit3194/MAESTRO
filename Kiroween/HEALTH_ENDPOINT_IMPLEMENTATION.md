@@ -1,7 +1,7 @@
 # Health Endpoint Implementation
 
 ## Overview
-The `/health` endpoint has been successfully implemented in `backend/main.py` to check the availability of AWS services required by MAESTRO.
+The `/health` endpoint has been successfully implemented in `backend/main.py` to check the availability of AWS services required by Haunted Helpdesk.
 
 ## Endpoint Details
 
@@ -23,7 +23,7 @@ The `/health` endpoint has been successfully implemented in `backend/main.py` to
     "dynamodb": {
       "available": true | false,
       "status": "active" | "error",
-      "table_name": "MaestroTickets",
+      "table_name": "Haunted HelpdeskTickets",
       "message": "DynamoDB table is ACTIVE"
     }
   }

@@ -1,4 +1,4 @@
-# MAESTRO Agents Module
+# Haunted Helpdesk Agents Module
 
 from agents.orchestrator_agent import create_orchestrator_agent
 from agents.memory_agent import create_memory_agent

@@ -1,5 +1,5 @@
 """
-Network Diagnostic Agent for MAESTRO
+Network Diagnostic Agent for Haunted Helpdesk
 
 Performs automated network troubleshooting using diagnostic tools.
 Analyzes connectivity, routing, and DNS issues to provide root cause analysis.
@@ -17,7 +17,7 @@ def create_network_diagnostic_agent() -> Agent:
     Returns:
         Configured Network Diagnostic Agent instance
     """
-    system_prompt = """You are the Network Diagnostic Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Network Diagnostic Agent in the Haunted Helpdesk multi-agent system.
 
 Your role is to diagnose and troubleshoot network-related issues using specialized diagnostic tools.
 

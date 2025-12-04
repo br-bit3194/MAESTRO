@@ -1,7 +1,7 @@
 """
-DynamoDB utilities for MAESTRO ticket management.
+DynamoDB utilities for Haunted Helpdesk ticket management.
 
-This module provides a DynamoDBManager class for CRUD operations on the MaestroTickets table.
+This module provides a DynamoDBManager class for CRUD operations on the Haunted HelpdeskTickets table.
 """
 
 import boto3
@@ -12,14 +12,14 @@ import json
 
 
 class DynamoDBManager:
-    """Manager class for DynamoDB operations on MaestroTickets table."""
+    """Manager class for DynamoDB operations on Haunted HelpdeskTickets table."""
     
-    def __init__(self, table_name: str = "MaestroTickets"):
+    def __init__(self, table_name: str = "Haunted HelpdeskTickets"):
         """
-        Initialize DynamoDB manager with connection to MaestroTickets table.
+        Initialize DynamoDB manager with connection to Haunted HelpdeskTickets table.
         
         Args:
-            table_name: Name of the DynamoDB table (default: MaestroTickets)
+            table_name: Name of the DynamoDB table (default: Haunted HelpdeskTickets)
         """
         self.dynamodb = boto3.resource('dynamodb')
         self.table_name = table_name

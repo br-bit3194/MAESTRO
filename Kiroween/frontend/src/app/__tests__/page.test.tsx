@@ -76,7 +76,7 @@ describe('Landing Page with 3D Model Integration', () => {
     it('should preserve hero title with proper heading', () => {
       render(<Home />);
       
-      const heroTitle = screen.getByRole('heading', { name: /maestro/i });
+      const heroTitle = screen.getByRole('heading', { name: /Haunted Helpdesk/i });
       expect(heroTitle).toBeInTheDocument();
       expect(heroTitle).toHaveAttribute('id', 'hero-title');
     });

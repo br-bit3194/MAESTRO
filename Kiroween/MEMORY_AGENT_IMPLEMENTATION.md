@@ -28,7 +28,7 @@ Complete implementation with all required components:
 - **Features**:
   - Generates unique ID with timestamp
   - Stores query, resolution, timestamp, and keywords
-  - Appends to JSON file (memories/maestro_memories.json)
+  - Appends to JSON file (memories/Haunted Helpdesk_memories.json)
   - Extracts keywords for future matching
 
 #### 3. Tool: list_memories
@@ -68,7 +68,7 @@ Complete implementation with all required components:
 ✅ `store_memory` tool stores resolution with query, resolution text, and timestamp
 
 ### Requirement 3.5: Memory Agent stores resolution
-✅ Persists to `memories/maestro_memories.json` file (configurable path)
+✅ Persists to `memories/Haunted Helpdesk_memories.json` file (configurable path)
 
 ### Requirement 3.6: Memory Agent completes operation
 ✅ Agent configured with `handoff_to=["orchestrator_agent"]` to always hand back
@@ -145,7 +145,7 @@ agents/
 
 backend/
 └── memories/
-    └── maestro_memories.json  # Memory storage (created automatically)
+    └── Haunted Helpdesk_memories.json  # Memory storage (created automatically)
 
 test_memory_logic.py         # Core logic tests
 MEMORY_AGENT_IMPLEMENTATION.md  # This document
@@ -168,7 +168,7 @@ To use the Memory Agent:
    ```
 
 3. **Use in Swarm**:
-   The agent is ready to be integrated into the MAESTRO swarm orchestration
+   The agent is ready to be integrated into the Haunted Helpdesk swarm orchestration
    with the Orchestrator Agent and other specialized agents.
 
 ## Notes

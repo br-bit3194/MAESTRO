@@ -1,1 +1,1 @@
-# MAESTRO Backend Module
+# Haunted Helpdesk Backend Module

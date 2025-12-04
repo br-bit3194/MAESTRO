@@ -1,10 +1,10 @@
 # Accessibility Features
 
-This document outlines the accessibility features implemented in the MAESTRO frontend application.
+This document outlines the accessibility features implemented in the Haunted Helpdesk frontend application.
 
 ## Overview
 
-The MAESTRO application has been designed with accessibility in mind, following WCAG 2.1 Level AA guidelines to ensure the application is usable by people with disabilities.
+The Haunted Helpdesk application has been designed with accessibility in mind, following WCAG 2.1 Level AA guidelines to ensure the application is usable by people with disabilities.
 
 ## Implemented Features
 

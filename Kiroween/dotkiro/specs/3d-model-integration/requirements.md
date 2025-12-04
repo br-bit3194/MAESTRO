@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature adds an interactive and scary 3D model experience to the MAESTRO AI-Ops landing page. The system shall display GLB format 3D models (base_basic_pbr.glb and base_basic_shaded.glb) with voice effects, animations, and frightening visual effects. Users can interact with the model through hover and click actions, triggering scary sounds, character animations, and particle effects. The feature enhances the Halloween-themed interface with an immersive, responsive horror experience while maintaining accessibility and performance standards.
+This feature adds an interactive and scary 3D model experience to the Haunted Helpdesk AI-Ops landing page. The system shall display GLB format 3D models (base_basic_pbr.glb and base_basic_shaded.glb) with voice effects, animations, and frightening visual effects. Users can interact with the model through hover and click actions, triggering scary sounds, character animations, and particle effects. The feature enhances the Halloween-themed interface with an immersive, responsive horror experience while maintaining accessibility and performance standards.
 
 ## Glossary
 
@@ -27,7 +27,7 @@ This feature adds an interactive and scary 3D model experience to the MAESTRO AI
 
 ### Requirement 1
 
-**User Story:** As a visitor to the landing page, I want to see an interactive 3D model, so that I can experience a more engaging and immersive visual presentation of the MAESTRO platform.
+**User Story:** As a visitor to the landing page, I want to see an interactive 3D model, so that I can experience a more engaging and immersive visual presentation of the Haunted Helpdesk platform.
 
 #### Acceptance Criteria
 

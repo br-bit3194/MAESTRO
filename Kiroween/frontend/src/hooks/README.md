@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `useTicketWorkflow` hook manages real-time workflow updates for ticket processing in the MAESTRO system. It polls the backend API to track agent handoffs, updates the active agent visualization, and maintains a log of workflow events.
+The `useTicketWorkflow` hook manages real-time workflow updates for ticket processing in the Haunted Helpdesk system. It polls the backend API to track agent handoffs, updates the active agent visualization, and maintains a log of workflow events.
 
 ## Features
 

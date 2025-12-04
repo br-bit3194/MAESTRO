@@ -2,7 +2,7 @@
 
 ## Overview
 
-MAESTRO is a sophisticated multi-agent IT operations platform that automates incident resolution through intelligent agent collaboration. The system architecture consists of three primary layers:
+Haunted Helpdesk is a sophisticated multi-agent IT operations platform that automates incident resolution through intelligent agent collaboration. The system architecture consists of three primary layers:
 
 1. **Frontend Layer**: Next.js 16 application with React 19, featuring a Halloween-themed UI with supernatural agent representations
 2. **Backend Layer**: FastAPI application orchestrating the Strands multi-agent framework with AWS Bedrock integration
@@ -31,7 +31,7 @@ The core innovation is the swarm-based workflow where six specialized agents col
 │  └────────────────────┬─────────────────────────────────┘   │
 │                       │                                      │
 │  ┌────────────────────┴─────────────────────────────────┐   │
-│  │         Maestro Swarm (Strands Framework)            │   │
+│  │         Haunted Helpdesk Swarm (Strands Framework)            │   │
 │  │                                                       │   │
 │  │  ┌──────────┐    ┌──────────┐    ┌──────────┐      │   │
 │  │  │Orchestr. │───▶│  Memory  │───▶│Ticketing │      │   │
@@ -106,8 +106,8 @@ The system follows a strict workflow sequence to ensure consistent processing:
 - Strands image_reader tool for multimodal analysis
 
 **Data Storage:**
-- AWS DynamoDB (MaestroTickets table)
-- JSON file storage (memories/maestro_memories.json)
+- AWS DynamoDB (Haunted HelpdeskTickets table)
+- JSON file storage (memories/Haunted Helpdesk_memories.json)
 
 ## Components and Interfaces
 
@@ -154,7 +154,7 @@ class TicketResponse(BaseModel):
     resolution: Optional[str]
 ```
 
-#### 2. Maestro Swarm (`backend/maestro_swarm.py`)
+#### 2. Haunted Helpdesk Swarm (`backend/Haunted Helpdesk_swarm.py`)
 
 **Responsibilities:**
 - Initialize all six agents
@@ -616,7 +616,7 @@ Each agent has a unique SVG-based character:
 
 ### Property 17: Memory file persistence
 
-*For any* resolution stored by Memory Agent, the memories/maestro_memories.json file should contain an entry with the stored resolution after the storage operation completes.
+*For any* resolution stored by Memory Agent, the memories/Haunted Helpdesk_memories.json file should contain an entry with the stored resolution after the storage operation completes.
 **Validates: Requirements 3.5**
 
 ### Property 18: Memory Agent always returns to Orchestrator
@@ -853,7 +853,7 @@ Each agent has a unique SVG-based character:
 
 **Test Tagging**: Each property-based test must include a comment tag in this exact format:
 ```python
-# Feature: maestro-ai-ops, Property X: [property description]
+# Feature: Haunted Helpdesk-ai-ops, Property X: [property description]
 ```
 
 **Backend Property Tests:**
@@ -974,7 +974,7 @@ Each agent has a unique SVG-based character:
 
 **Required AWS Services:**
 - AWS Bedrock (Claude 3.5 Sonnet access)
-- DynamoDB (MaestroTickets table)
+- DynamoDB (Haunted HelpdeskTickets table)
 - IAM roles and policies
 - (Optional) S3 for file storage
 - (Optional) CloudWatch for logging
@@ -999,7 +999,7 @@ Each agent has a unique SVG-based character:
         "dynamodb:Scan",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/MaestroTickets"
+      "Resource": "arn:aws:dynamodb:*:*:table/Haunted HelpdeskTickets"
     },
     {
       "Effect": "Allow",
@@ -1021,8 +1021,8 @@ Each agent has a unique SVG-based character:
 AWS_REGION=us-west-2
 AWS_ACCESS_KEY_ID=<your-key>
 AWS_SECRET_ACCESS_KEY=<your-secret>
-DYNAMODB_TABLE_NAME=MaestroTickets
-MEMORY_FILE_PATH=memories/maestro_memories.json
+DYNAMODB_TABLE_NAME=Haunted HelpdeskTickets
+MEMORY_FILE_PATH=memories/Haunted Helpdesk_memories.json
 UPLOAD_DIR=uploads/
 MAX_FILE_SIZE_MB=10
 CORS_ORIGINS=http://localhost:3000,http://localhost:8000

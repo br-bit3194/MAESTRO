@@ -1,7 +1,7 @@
 """
-MAESTRO FastAPI Application
+Haunted Helpdesk FastAPI Application
 
-Main FastAPI application for the MAESTRO AI-powered multi-agent IT operations platform.
+Main FastAPI application for the Haunted Helpdesk AI-powered multi-agent IT operations platform.
 Provides REST API endpoints for ticket management and workflow processing.
 """
 
@@ -16,18 +16,18 @@ import os
 import uuid
 import shutil
 
-# Import MAESTRO components
+# Import Haunted Helpdesk components
 from backend.dynamodb_utils import db_manager
-from backend.maestro_swarm import create_maestro_swarm
+from backend.Haunted Helpdesk_swarm import create_Haunted Helpdesk_swarm
 from backend.multimodal_input import process_multimodal_input
 
 
 # Initialize FastAPI application
 app = FastAPI(
-    title="MAESTRO - Multi-Agent IT Operations Platform",
+    title="Haunted Helpdesk - Multi-Agent IT Operations Platform",
     description=(
         "AI-powered multi-agent system for automated IT incident resolution. "
-        "MAESTRO orchestrates six specialized agents (Orchestrator, Memory, Ticketing, "
+        "Haunted Helpdesk orchestrates six specialized agents (Orchestrator, Memory, Ticketing, "
         "Network Diagnostic, Cloud Service, and Summarization) to resolve IT incidents "
         "efficiently with persistent memory capabilities."
     ),
@@ -105,7 +105,7 @@ async def health_check() -> Dict[str, Any]:
     
     Checks:
     - AWS Bedrock availability (Claude 3.5 Sonnet model)
-    - DynamoDB table accessibility (MaestroTickets)
+    - DynamoDB table accessibility (Haunted HelpdeskTickets)
     
     Returns:
         JSON object with overall status and individual service statuses
@@ -141,7 +141,7 @@ async def _check_bedrock_availability() -> Dict[str, Any]:
     try:
         bedrock_client = boto3.client('bedrock-runtime')
         
-        # The model ID we're using for MAESTRO
+        # The model ID we're using for Haunted Helpdesk
         model_id = "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
         
         # Try a minimal invocation to verify access
@@ -437,12 +437,12 @@ async def get_ticket(ticket_id: str) -> TicketResponse:
 @app.post("/api/process-ticket/{ticket_id}")
 async def process_ticket(ticket_id: str) -> Dict[str, Any]:
     """
-    Process a ticket through the MAESTRO multi-agent workflow.
+    Process a ticket through the Haunted Helpdesk multi-agent workflow.
     
     This endpoint initiates the complete workflow sequence:
     1. Retrieves the ticket from DynamoDB
     2. Updates ticket status to "processing"
-    3. Initializes the MAESTRO swarm
+    3. Initializes the Haunted Helpdesk swarm
     4. Executes the swarm with the ticket content
     5. Returns the workflow result with handoff sequence and final response
     
@@ -485,8 +485,8 @@ async def process_ticket(ticket_id: str) -> Dict[str, Any]:
         }
         db_manager.update_ticket(ticket_id, update_data)
         
-        # Step 3: Initialize maestro swarm
-        swarm = create_maestro_swarm()
+        # Step 3: Initialize Haunted Helpdesk swarm
+        swarm = create_Haunted Helpdesk_swarm()
         
         # Prepare ticket content for workflow
         ticket_content = f"""
@@ -785,7 +785,7 @@ async def submit_ticket(
 
 async def process_ticket_workflow(ticket_id: str, ticket_content: str):
     """
-    Background task to process ticket through MAESTRO workflow.
+    Background task to process ticket through Haunted Helpdesk workflow.
     
     This function runs asynchronously in the background to avoid blocking
     the API response. It executes the complete multi-agent workflow.
@@ -797,8 +797,8 @@ async def process_ticket_workflow(ticket_id: str, ticket_content: str):
     import time
     
     try:
-        # Initialize maestro swarm
-        swarm = create_maestro_swarm()
+        # Initialize Haunted Helpdesk swarm
+        swarm = create_Haunted Helpdesk_swarm()
         
         # Prepare ticket content for workflow
         ticket = db_manager.get_ticket(ticket_id)

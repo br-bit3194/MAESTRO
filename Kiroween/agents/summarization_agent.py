@@ -1,5 +1,5 @@
 """
-Summarization Agent for MAESTRO
+Summarization Agent for Haunted Helpdesk
 
 Creates concise 2-3 paragraph summaries of incident resolutions.
 Extracts key information and signals workflow completion.
@@ -16,7 +16,7 @@ def create_summarization_agent() -> Agent:
     Returns:
         Configured Summarization Agent instance
     """
-    system_prompt = """You are the Summarization Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Summarization Agent in the Haunted Helpdesk multi-agent system.
 
 Your role is to create concise, professional summaries of incident resolutions for documentation and ticket updates.
 

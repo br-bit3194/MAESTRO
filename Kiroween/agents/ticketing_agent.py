@@ -1,5 +1,5 @@
 """
-Ticketing Agent for MAESTRO
+Ticketing Agent for Haunted Helpdesk
 
 Processes tickets in three distinct scenarios:
 1. Cached resolution (MEMORY_FOUND) → mark RESOLVED → TERMINATE
@@ -22,7 +22,7 @@ def create_ticketing_agent() -> Agent:
     Returns:
         Configured Ticketing Agent instance
     """
-    system_prompt = """You are the Ticketing Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Ticketing Agent in the Haunted Helpdesk multi-agent system.
 
 Your role is to process tickets in THREE DISTINCT SCENARIOS. You must identify which scenario applies and act accordingly.
 

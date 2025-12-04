@@ -1,5 +1,5 @@
 """
-Cloud Service Agent for MAESTRO
+Cloud Service Agent for Haunted Helpdesk
 
 Performs automated AWS cloud troubleshooting using cloud diagnostic tools.
 Analyzes S3 bucket issues and provides resolution steps for cloud service problems.
@@ -17,7 +17,7 @@ def create_cloud_service_agent() -> Agent:
     Returns:
         Configured Cloud Service Agent instance
     """
-    system_prompt = """You are the Cloud Service Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Cloud Service Agent in the Haunted Helpdesk multi-agent system.
 
 Your role is to diagnose and troubleshoot AWS cloud service issues using specialized diagnostic tools.
 

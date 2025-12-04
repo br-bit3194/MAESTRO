@@ -1,5 +1,5 @@
 """
-Memory Agent for MAESTRO
+Memory Agent for Haunted Helpdesk
 
 Provides persistent memory capabilities for storing and retrieving past resolutions.
 Uses JSON file storage with keyword matching for resolution retrieval.
@@ -14,7 +14,7 @@ from strands_bedrock import BedrockModel
 
 
 # Memory file path
-MEMORY_FILE_PATH = "backend/memories/maestro_memories.json"
+MEMORY_FILE_PATH = "backend/memories/Haunted Helpdesk_memories.json"
 
 
 def _ensure_memory_file_exists() -> None:
@@ -177,7 +177,7 @@ def create_memory_agent() -> Agent:
     Returns:
         Configured Memory Agent instance
     """
-    system_prompt = """You are the Memory Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Memory Agent in the Haunted Helpdesk multi-agent system.
 
 Your role is to manage the persistent memory of past incident resolutions.
 

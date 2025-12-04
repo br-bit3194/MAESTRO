@@ -102,7 +102,7 @@ def verify_endpoint_implementation():
     # Background workflow execution
     print("✓ Background workflow execution")
     print("  Implementation: async def process_ticket_workflow(ticket_id, ticket_content)")
-    print("  - Initializes maestro swarm")
+    print("  - Initializes Haunted Helpdesk swarm")
     print("  - Executes workflow with ticket content")
     print("  - Logs completion and errors")
     print("  - Updates ticket status on error")

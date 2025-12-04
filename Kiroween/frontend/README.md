@@ -1,6 +1,6 @@
-# MAESTRO Frontend
+# Haunted Helpdesk Frontend
 
-Halloween-themed Next.js frontend for the MAESTRO AI-Ops platform.
+Halloween-themed Next.js frontend for the Haunted Helpdesk AI-Ops platform.
 
 ## Getting Started
 

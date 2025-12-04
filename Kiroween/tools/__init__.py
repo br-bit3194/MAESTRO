@@ -1,5 +1,5 @@
 """
-MAESTRO Network and Cloud Diagnostic Tools
+Haunted Helpdesk Network and Cloud Diagnostic Tools
 
 This module provides diagnostic tools for network troubleshooting and cloud service operations.
 """

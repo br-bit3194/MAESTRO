@@ -1,12 +1,12 @@
-# 🎃 MAESTRO - Multi-Agent IT Operations Platform
+# 🎃 Haunted Helpdesk - Multi-Agent IT Operations Platform
 
 **Where IT Nightmares Come to Die**
 
-MAESTRO is an AI-powered multi-agent IT operations platform that automates incident resolution using intelligent agent workflows with persistent memory capabilities. The system leverages AWS Bedrock (Claude 3.5 Sonnet), the Strands multi-agent framework, DynamoDB for ticket storage, and a Next.js frontend with a Halloween-themed interface.
+Haunted Helpdesk is an AI-powered multi-agent IT operations platform that automates incident resolution using intelligent agent workflows with persistent memory capabilities. The system leverages AWS Bedrock (Claude 3.5 Sonnet), the Strands multi-agent framework, DynamoDB for ticket storage, and a Next.js frontend with a Halloween-themed interface.
 
 ## 🦇 Architecture Overview
 
-MAESTRO uses a multi-agent architecture powered by the Strands framework and AWS Bedrock. The platform orchestrates six specialized agents that work together to resolve IT incidents through structured handoffs and persistent memory.
+Haunted Helpdesk uses a multi-agent architecture powered by the Strands framework and AWS Bedrock. The platform orchestrates six specialized agents that work together to resolve IT incidents through structured handoffs and persistent memory.
 
 ### Agent Coven
 
@@ -37,7 +37,7 @@ MAESTRO uses a multi-agent architecture powered by the Strands framework and AWS
 └─────────────────────────┬───────────────────────────────────┘
                           │
 ┌─────────────────────────┴───────────────────────────────────┐
-│              Maestro Swarm (Strands Framework)               │
+│              Haunted Helpdesk Swarm (Strands Framework)               │
 │  • Agent orchestration with handoff rules                    │
 │  • Workflow execution with timeouts and limits               │
 │  • Repetitive handoff detection                              │
@@ -65,12 +65,12 @@ MAESTRO uses a multi-agent architecture powered by the Strands framework and AWS
 
 ## 🚀 Quick Start
 
-Get MAESTRO running in 5 minutes:
+Get Haunted Helpdesk running in 5 minutes:
 
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd maestro
+cd Haunted Helpdesk
 
 # 2. Set up AWS credentials (ensure you have Bedrock access and DynamoDB table)
 export AWS_ACCESS_KEY_ID=your_key
@@ -139,7 +139,7 @@ cp backend/.env.example backend/.env
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `DYNAMODB_TABLE_NAME` | Name of the tickets table | Yes | MaestroTickets |
+| `DYNAMODB_TABLE_NAME` | Name of the tickets table | Yes | Haunted HelpdeskTickets |
 
 #### API Configuration
 
@@ -161,7 +161,7 @@ cp backend/.env.example backend/.env
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `MEMORY_DIR` | Directory for memory storage | No | backend/memories |
-| `MEMORY_FILE` | Memory JSON file name | No | maestro_memories.json |
+| `MEMORY_FILE` | Memory JSON file name | No | Haunted Helpdesk_memories.json |
 
 #### Swarm Configuration
 
@@ -190,7 +190,7 @@ cp frontend/.env.local.example frontend/.env.local
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_APP_NAME` | Application name | No | MAESTRO |
+| `NEXT_PUBLIC_APP_NAME` | Application name | No | Haunted Helpdesk |
 | `NEXT_PUBLIC_APP_TAGLINE` | Application tagline | No | Where IT Nightmares Come to Die |
 
 #### Feature Flags
@@ -216,7 +216,7 @@ cp frontend/.env.local.example frontend/.env.local
 
 ```bash
 aws dynamodb create-table \
-    --table-name MaestroTickets \
+    --table-name Haunted HelpdeskTickets \
     --attribute-definitions \
         AttributeName=ticket_id,AttributeType=S \
     --key-schema \
@@ -250,7 +250,7 @@ Your AWS credentials need the following permissions:
         "dynamodb:Scan",
         "dynamodb:Query"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/MaestroTickets"
+      "Resource": "arn:aws:dynamodb:*:*:table/Haunted HelpdeskTickets"
     }
   ]
 }
@@ -592,7 +592,7 @@ npm test -- --coverage
 2. Observe workflow in UI (Demo page)
 3. Verify agents activate in sequence: Orchestrator → Memory → Ticketing → Orchestrator → Network Diagnostic → Orchestrator → Memory → Summarization → Ticketing
 4. Check ticket status changes to "resolved"
-5. Verify resolution stored in `backend/memories/maestro_memories.json`
+5. Verify resolution stored in `backend/memories/Haunted Helpdesk_memories.json`
 
 **Expected Result**: Ticket resolved with network diagnostic results and resolution stored for future use.
 
@@ -759,17 +759,17 @@ An error occurred (ExpiredToken) when calling the ListBuckets operation: The pro
 
 #### Table Not Found
 
-**Error**: `ResourceNotFoundException` for MaestroTickets table
+**Error**: `ResourceNotFoundException` for Haunted HelpdeskTickets table
 
 **Solution**:
 1. Verify the table exists:
    ```bash
-   aws dynamodb describe-table --table-name MaestroTickets --region us-east-1
+   aws dynamodb describe-table --table-name Haunted HelpdeskTickets --region us-east-1
    ```
 2. If table doesn't exist, create it:
    ```bash
    aws dynamodb create-table \
-       --table-name MaestroTickets \
+       --table-name Haunted HelpdeskTickets \
        --attribute-definitions AttributeName=ticket_id,AttributeType=S \
        --key-schema AttributeName=ticket_id,KeyType=HASH \
        --billing-mode PAY_PER_REQUEST \
@@ -794,12 +794,12 @@ An error occurred (ExpiredToken) when calling the ListBuckets operation: The pro
        "dynamodb:UpdateItem",
        "dynamodb:Scan"
      ],
-     "Resource": "arn:aws:dynamodb:*:*:table/MaestroTickets"
+     "Resource": "arn:aws:dynamodb:*:*:table/Haunted HelpdeskTickets"
    }
    ```
 3. Test permissions with AWS CLI:
    ```bash
-   aws dynamodb scan --table-name MaestroTickets --limit 1
+   aws dynamodb scan --table-name Haunted HelpdeskTickets --limit 1
    ```
 
 ### Bedrock Access Issues
@@ -895,7 +895,7 @@ An error occurred (ExpiredToken) when calling the ListBuckets operation: The pro
 3. Ensure `MEMORY_DIR` and `MEMORY_FILE` are set correctly in `backend/.env`
 4. Initialize empty memory file if needed:
    ```bash
-   echo "[]" > backend/memories/maestro_memories.json
+   echo "[]" > backend/memories/Haunted Helpdesk_memories.json
    ```
 
 #### Memory File Corrupted
@@ -905,15 +905,15 @@ An error occurred (ExpiredToken) when calling the ListBuckets operation: The pro
 **Solution**:
 1. Backup existing file:
    ```bash
-   cp backend/memories/maestro_memories.json backend/memories/maestro_memories.json.backup
+   cp backend/memories/Haunted Helpdesk_memories.json backend/memories/Haunted Helpdesk_memories.json.backup
    ```
 2. Validate JSON:
    ```bash
-   python -m json.tool backend/memories/maestro_memories.json
+   python -m json.tool backend/memories/Haunted Helpdesk_memories.json
    ```
 3. If corrupted, reset to empty array:
    ```bash
-   echo "[]" > backend/memories/maestro_memories.json
+   echo "[]" > backend/memories/Haunted Helpdesk_memories.json
    ```
 
 ### File Upload Issues
@@ -1093,7 +1093,7 @@ Visit [AWS Service Health Dashboard](https://status.aws.amazon.com/) to check fo
 ## 📸 Screenshots
 
 ### Landing Page - Haunted Mansion Entrance
-The landing page features a spooky Halloween theme with floating ghosts, flying bats, spider webs, and fog effects. The hero section introduces MAESTRO with an animated title and the tagline "Where IT Nightmares Come to Die."
+The landing page features a spooky Halloween theme with floating ghosts, flying bats, spider webs, and fog effects. The hero section introduces Haunted Helpdesk with an animated title and the tagline "Where IT Nightmares Come to Die."
 
 ### Demo Page - Crypt Control Center
 The main control center where users can:
@@ -1341,4 +1341,4 @@ We love feature ideas! Please open an issue with:
 
 **Built with 🎃 for automating IT nightmares**
 
-*"In the crypt of code, where bugs dare to lurk, MAESTRO's agents work their magic, making IT operations less berserk!"*
+*"In the crypt of code, where bugs dare to lurk, Haunted Helpdesk's agents work their magic, making IT operations less berserk!"*

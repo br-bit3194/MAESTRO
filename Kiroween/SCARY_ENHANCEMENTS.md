@@ -32,7 +32,7 @@ I've transformed the landing page into a **truly terrifying experience** with in
 - Much more ominous and foreboding
 - Better contrast for glowing effects
 
-#### **Enhanced Title (MAESTRO)**
+#### **Enhanced Title (Haunted Helpdesk)**
 - RGB glitch layers that shift randomly
 - Red and green ghost text
 - Intense glowing shadows (orange + red)

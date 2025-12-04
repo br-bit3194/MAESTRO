@@ -2,7 +2,7 @@
 
 ## ✅ Completed Implementation
 
-I've successfully implemented all the interactive and scary features for the 3D model on the MAESTRO landing page!
+I've successfully implemented all the interactive and scary features for the 3D model on the Haunted Helpdesk landing page!
 
 ### 🎃 Features Implemented
 

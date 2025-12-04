@@ -2,7 +2,7 @@
 
 ## Task 33: Add Accessibility Features - Completed
 
-This document summarizes all accessibility improvements implemented across the MAESTRO frontend application.
+This document summarizes all accessibility improvements implemented across the Haunted Helpdesk frontend application.
 
 ## Changes Made
 
@@ -242,4 +242,4 @@ To fully validate these accessibility improvements, the following testing should
 
 ## Conclusion
 
-Task 33 has been successfully completed with comprehensive accessibility improvements across the entire MAESTRO frontend application. The implementation follows WCAG 2.1 Level AA guidelines and provides a solid foundation for an accessible user experience.
+Task 33 has been successfully completed with comprehensive accessibility improvements across the entire Haunted Helpdesk frontend application. The implementation follows WCAG 2.1 Level AA guidelines and provides a solid foundation for an accessible user experience.

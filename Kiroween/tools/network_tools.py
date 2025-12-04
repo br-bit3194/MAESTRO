@@ -1,5 +1,5 @@
 """
-Network Diagnostic Tools for MAESTRO
+Network Diagnostic Tools for Haunted Helpdesk
 
 Provides network troubleshooting capabilities including ping, traceroute, and DNS resolution checks.
 """

@@ -2,11 +2,11 @@
 
 ## Introduction
 
-MAESTRO is an AI-powered multi-agent IT operations platform that automates incident resolution using intelligent agent workflows with persistent memory capabilities. The system leverages AWS Bedrock (Claude 3.5 Sonnet), the Strands multi-agent framework, DynamoDB for ticket storage, and a Next.js frontend with a Halloween-themed interface. The platform orchestrates six specialized agents (Orchestrator, Memory, Ticketing, Network Diagnostic, Cloud Service, and Summarization) that work together to resolve IT incidents efficiently by learning from past resolutions.
+Haunted Helpdesk is an AI-powered multi-agent IT operations platform that automates incident resolution using intelligent agent workflows with persistent memory capabilities. The system leverages AWS Bedrock (Claude 3.5 Sonnet), the Strands multi-agent framework, DynamoDB for ticket storage, and a Next.js frontend with a Halloween-themed interface. The platform orchestrates six specialized agents (Orchestrator, Memory, Ticketing, Network Diagnostic, Cloud Service, and Summarization) that work together to resolve IT incidents efficiently by learning from past resolutions.
 
 ## Glossary
 
-- **MAESTRO System**: The complete AI-powered multi-agent IT operations platform
+- **Haunted Helpdesk System**: The complete AI-powered multi-agent IT operations platform
 - **Strands Framework**: The multi-agent orchestration framework used for agent coordination
 - **Swarm**: A collection of agents working together with defined handoff rules
 - **Agent**: An autonomous AI entity with specific tools and responsibilities
@@ -36,11 +36,11 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN a user submits a ticket with text description THEN the MAESTRO System SHALL create a structured ticket with unique identifier
-2. WHEN a user uploads error screenshots with a ticket THEN the MAESTRO System SHALL analyze images using multimodal capabilities and extract error information
-3. WHEN a ticket is created THEN the MAESTRO System SHALL persist the ticket to DynamoDB immediately
-4. WHEN image analysis completes THEN the MAESTRO System SHALL combine text description and image analysis into unified ticket content
-5. WHEN a user submits an empty ticket THEN the MAESTRO System SHALL reject the submission and return validation error
+1. WHEN a user submits a ticket with text description THEN the Haunted Helpdesk System SHALL create a structured ticket with unique identifier
+2. WHEN a user uploads error screenshots with a ticket THEN the Haunted Helpdesk System SHALL analyze images using multimodal capabilities and extract error information
+3. WHEN a ticket is created THEN the Haunted Helpdesk System SHALL persist the ticket to DynamoDB immediately
+4. WHEN image analysis completes THEN the Haunted Helpdesk System SHALL combine text description and image analysis into unified ticket content
+5. WHEN a user submits an empty ticket THEN the Haunted Helpdesk System SHALL reject the submission and return validation error
 
 ### Requirement 2
 
@@ -66,7 +66,7 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 2. WHEN Memory Agent finds matching resolution THEN the Memory Agent SHALL return "MEMORY_FOUND: [resolution]" format
 3. WHEN Memory Agent finds no matching resolution THEN the Memory Agent SHALL return "NO_MEMORY_FOUND" response
 4. WHEN Memory Agent receives explicit storage request THEN the Memory Agent SHALL store resolution with query, resolution text, and timestamp
-5. WHEN Memory Agent stores a resolution THEN the Memory Agent SHALL persist to memories/maestro_memories.json file
+5. WHEN Memory Agent stores a resolution THEN the Memory Agent SHALL persist to memories/Haunted Helpdesk_memories.json file
 6. WHEN Memory Agent completes any operation THEN the Memory Agent SHALL hand back to Orchestrator Agent
 
 ### Requirement 4
@@ -123,13 +123,13 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN API receives GET request to /health endpoint THEN the MAESTRO System SHALL return health status including AWS service availability
-2. WHEN API receives POST request to /api/tickets THEN the MAESTRO System SHALL create new ticket and return ticket identifier
-3. WHEN API receives GET request to /api/tickets THEN the MAESTRO System SHALL return list of all tickets from DynamoDB
-4. WHEN API receives GET request to /api/tickets/{ticket_id} THEN the MAESTRO System SHALL return specific ticket details
-5. WHEN API receives POST request to /api/process-ticket/{ticket_id} THEN the MAESTRO System SHALL initiate workflow processing for that ticket
-6. WHEN API receives POST request to /api/submit-ticket with multipart form data THEN the MAESTRO System SHALL process text and file attachments
-7. WHEN API processes requests THEN the MAESTRO System SHALL enable CORS for localhost:3000 and localhost:8000
+1. WHEN API receives GET request to /health endpoint THEN the Haunted Helpdesk System SHALL return health status including AWS service availability
+2. WHEN API receives POST request to /api/tickets THEN the Haunted Helpdesk System SHALL create new ticket and return ticket identifier
+3. WHEN API receives GET request to /api/tickets THEN the Haunted Helpdesk System SHALL return list of all tickets from DynamoDB
+4. WHEN API receives GET request to /api/tickets/{ticket_id} THEN the Haunted Helpdesk System SHALL return specific ticket details
+5. WHEN API receives POST request to /api/process-ticket/{ticket_id} THEN the Haunted Helpdesk System SHALL initiate workflow processing for that ticket
+6. WHEN API receives POST request to /api/submit-ticket with multipart form data THEN the Haunted Helpdesk System SHALL process text and file attachments
+7. WHEN API processes requests THEN the Haunted Helpdesk System SHALL enable CORS for localhost:3000 and localhost:8000
 
 ### Requirement 9
 
@@ -137,12 +137,12 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN user visits landing page THEN the MAESTRO System SHALL display haunted mansion entrance with floating ghosts, bats, and fog effects
-2. WHEN user navigates to demo page THEN the MAESTRO System SHALL display Crypt Control Center with agent visualization
-3. WHEN user submits ticket through form THEN the MAESTRO System SHALL display ticket submission interface with severity and realm selection
-4. WHEN workflow processes ticket THEN the MAESTRO System SHALL visualize active agent in pentagram circle layout
-5. WHEN agents perform handoffs THEN the MAESTRO System SHALL update séance log with timestamped entries
-6. WHEN user views ticket list THEN the MAESTRO System SHALL display tickets as tombstones with status indicators
+1. WHEN user visits landing page THEN the Haunted Helpdesk System SHALL display haunted mansion entrance with floating ghosts, bats, and fog effects
+2. WHEN user navigates to demo page THEN the Haunted Helpdesk System SHALL display Crypt Control Center with agent visualization
+3. WHEN user submits ticket through form THEN the Haunted Helpdesk System SHALL display ticket submission interface with severity and realm selection
+4. WHEN workflow processes ticket THEN the Haunted Helpdesk System SHALL visualize active agent in pentagram circle layout
+5. WHEN agents perform handoffs THEN the Haunted Helpdesk System SHALL update séance log with timestamped entries
+6. WHEN user views ticket list THEN the Haunted Helpdesk System SHALL display tickets as tombstones with status indicators
 
 ### Requirement 10
 
@@ -150,12 +150,12 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN Orchestrator Agent is active THEN the MAESTRO System SHALL display Ghost character with ethereal glow and conductor's baton
-2. WHEN Memory Agent is active THEN the MAESTRO System SHALL display Skeleton character with glowing memory orbs and scroll
-3. WHEN Ticketing Agent is active THEN the MAESTRO System SHALL display Vampire character with cape and golden ticket
-4. WHEN Network Diagnostic Agent is active THEN the MAESTRO System SHALL display Witch character with network crystal ball
-5. WHEN Cloud Service Agent is active THEN the MAESTRO System SHALL display Grim Reaper character with cloud-shaped scythe
-6. WHEN Summarization Agent is active THEN the MAESTRO System SHALL display Mummy character wrapped in scrolls with TL;DR text
+1. WHEN Orchestrator Agent is active THEN the Haunted Helpdesk System SHALL display Ghost character with ethereal glow and conductor's baton
+2. WHEN Memory Agent is active THEN the Haunted Helpdesk System SHALL display Skeleton character with glowing memory orbs and scroll
+3. WHEN Ticketing Agent is active THEN the Haunted Helpdesk System SHALL display Vampire character with cape and golden ticket
+4. WHEN Network Diagnostic Agent is active THEN the Haunted Helpdesk System SHALL display Witch character with network crystal ball
+5. WHEN Cloud Service Agent is active THEN the Haunted Helpdesk System SHALL display Grim Reaper character with cloud-shaped scythe
+6. WHEN Summarization Agent is active THEN the Haunted Helpdesk System SHALL display Mummy character wrapped in scrolls with TL;DR text
 
 ### Requirement 11
 
@@ -163,11 +163,11 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN Cloud Service Agent encounters ExpiredToken error THEN the MAESTRO System SHALL prompt user to refresh AWS credentials
-2. WHEN user confirms credential refresh THEN the MAESTRO System SHALL retry the cloud operation
-3. WHEN AWS operations fail THEN the MAESTRO System SHALL return descriptive error messages without exposing sensitive details
-4. WHEN DynamoDB operations fail THEN the MAESTRO System SHALL handle errors gracefully and return appropriate status codes
-5. WHEN Bedrock API is unavailable THEN the MAESTRO System SHALL return service unavailable message
+1. WHEN Cloud Service Agent encounters ExpiredToken error THEN the Haunted Helpdesk System SHALL prompt user to refresh AWS credentials
+2. WHEN user confirms credential refresh THEN the Haunted Helpdesk System SHALL retry the cloud operation
+3. WHEN AWS operations fail THEN the Haunted Helpdesk System SHALL return descriptive error messages without exposing sensitive details
+4. WHEN DynamoDB operations fail THEN the Haunted Helpdesk System SHALL handle errors gracefully and return appropriate status codes
+5. WHEN Bedrock API is unavailable THEN the Haunted Helpdesk System SHALL return service unavailable message
 
 ### Requirement 12
 
@@ -175,8 +175,8 @@ MAESTRO is an AI-powered multi-agent IT operations platform that automates incid
 
 #### Acceptance Criteria
 
-1. WHEN testing agent handoff logic THEN the MAESTRO System SHALL verify correct routing for all ticket types
-2. WHEN testing memory retrieval THEN the MAESTRO System SHALL verify keyword matching returns correct resolutions
-3. WHEN testing ticket serialization THEN the MAESTRO System SHALL verify round-trip consistency between creation and retrieval
-4. WHEN testing workflow termination THEN the MAESTRO System SHALL verify no agent restarts workflow after Ticketing Agent terminates
-5. WHEN testing multimodal input THEN the MAESTRO System SHALL verify combined text and image analysis produces unified content
+1. WHEN testing agent handoff logic THEN the Haunted Helpdesk System SHALL verify correct routing for all ticket types
+2. WHEN testing memory retrieval THEN the Haunted Helpdesk System SHALL verify keyword matching returns correct resolutions
+3. WHEN testing ticket serialization THEN the Haunted Helpdesk System SHALL verify round-trip consistency between creation and retrieval
+4. WHEN testing workflow termination THEN the Haunted Helpdesk System SHALL verify no agent restarts workflow after Ticketing Agent terminates
+5. WHEN testing multimodal input THEN the Haunted Helpdesk System SHALL verify combined text and image analysis produces unified content

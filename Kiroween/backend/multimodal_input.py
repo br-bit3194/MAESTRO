@@ -1,5 +1,5 @@
 """
-Multimodal Input Processing for MAESTRO
+Multimodal Input Processing for Haunted Helpdesk
 
 Processes combined text and image inputs for ticket creation.
 Analyzes error screenshots using AI vision capabilities and combines with text descriptions.

@@ -1,7 +1,7 @@
 """
-Maestro Swarm Orchestration
+Haunted Helpdesk Swarm Orchestration
 
-Creates and configures the MAESTRO multi-agent swarm with all six specialized agents.
+Creates and configures the Haunted Helpdesk multi-agent swarm with all six specialized agents.
 Manages swarm parameters including handoff limits, timeouts, and repetitive handoff detection.
 """
 
@@ -14,9 +14,9 @@ from agents.cloud_service_agent import create_cloud_service_agent
 from agents.summarization_agent import create_summarization_agent
 
 
-def create_maestro_swarm() -> Swarm:
+def create_Haunted Helpdesk_swarm() -> Swarm:
     """
-    Create and configure the MAESTRO multi-agent swarm.
+    Create and configure the Haunted Helpdesk multi-agent swarm.
     
     The swarm consists of six specialized agents:
     1. Orchestrator Agent - Central routing and workflow coordination

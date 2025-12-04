@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design implements interactive 3D model visualization on the MAESTRO landing page using React Three Fiber and Three.js. The solution will load GLB format 3D models from the `3d_model` directory and render them with interactive controls, proper lighting, and responsive behavior across devices. The implementation prioritizes seamless integration with the existing Next.js architecture, Halloween theme aesthetics, and accessibility standards.
+This design implements interactive 3D model visualization on the Haunted Helpdesk landing page using React Three Fiber and Three.js. The solution will load GLB format 3D models from the `3d_model` directory and render them with interactive controls, proper lighting, and responsive behavior across devices. The implementation prioritizes seamless integration with the existing Next.js architecture, Halloween theme aesthetics, and accessibility standards.
 
 ## Architecture
 

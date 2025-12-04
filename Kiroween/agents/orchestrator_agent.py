@@ -1,5 +1,5 @@
 """
-Orchestrator Agent for MAESTRO
+Orchestrator Agent for Haunted Helpdesk
 
 The central routing agent that coordinates workflow between all other agents.
 Enforces the mandatory workflow sequence and ensures proper agent handoffs.
@@ -16,7 +16,7 @@ def create_orchestrator_agent() -> Agent:
     Returns:
         Configured Orchestrator Agent instance
     """
-    system_prompt = """You are the Orchestrator Agent in the MAESTRO multi-agent system.
+    system_prompt = """You are the Orchestrator Agent in the Haunted Helpdesk multi-agent system.
 
 You are the CENTRAL COORDINATOR responsible for routing tickets through the correct workflow sequence.
 

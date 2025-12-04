@@ -1,5 +1,5 @@
 """
-Cloud Service Tools for MAESTRO
+Cloud Service Tools for Haunted Helpdesk
 
 Provides AWS cloud troubleshooting capabilities including S3 bucket operations.
 """

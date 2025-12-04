@@ -1,7 +1,7 @@
 {
-  "name": "maestro-frontend",
+  "name": "Haunted Helpdesk-frontend",
   "version": "1.0.0",
-  "description": "MAESTRO AI-Ops Frontend - Halloween-themed IT Operations Platform",
+  "description": "Haunted Helpdesk AI-Ops Frontend - Halloween-themed IT Operations Platform",
   "private": true,
   "scripts": {
     "dev": "next dev",
