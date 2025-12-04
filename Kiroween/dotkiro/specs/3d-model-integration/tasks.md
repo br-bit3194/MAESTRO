@@ -1,24 +1,24 @@
 # Implementation Plan
 
 - [x] 1. Install dependencies and setup project structure
-
-
-  - Install @react-three/fiber, @react-three/drei, and three packages
+  - Install @react-three/fiber, @react-three/drei, @react-three/postprocessing, and three packages
+  - Install howler for audio management (optional)
   - Create frontend/public/models directory
+  - Create frontend/public/sounds directory for audio assets
   - Copy GLB files from 3d_model to frontend/public/models
+  - Add placeholder audio files (ambient_hover.mp3, scream_click.mp3, growl.mp3, whisper.mp3)
   - Verify Next.js configuration handles static assets correctly
-  - _Requirements: 2.1, 2.2, 5.2_
+  - _Requirements: 2.1, 2.2, 5.2, 10.1_
 
 
 
 - [ ] 2. Create Model3DViewer component with basic 3D rendering
   - Create frontend/src/components/Model3DViewer.tsx with "use client" directive
-  - Implement component props interface (modelPath, className, autoRotate, enableZoom, position, scale)
+  - Implement extended props interface (modelPath, className, autoRotate, enableZoom, position, scale, enableAudio, enableAnimations, enableEffects, respectMotionPreference)
   - Set up Canvas component from @react-three/fiber
   - Implement basic Scene3D internal component
   - Add Suspense boundary for loading states
-
-
+  - Add state management for interaction states (idle, hover, attack)
   - _Requirements: 2.3, 2.4, 1.1_
 
 
@@ -84,8 +84,6 @@
 
 
 - [x] 5.1 Write property test for interactive rotation
-
-
   - **Property 3: Interactive rotation enabled**
   - **Validates: Requirements 1.3**
 
@@ -121,8 +119,6 @@
 
 - [ ] 7.1 Write property test for responsive sizing
   - **Property 4: Responsive canvas sizing**
-
-
   - **Validates: Requirements 3.4**
 
 - [ ] 8. Add accessibility features
@@ -143,9 +139,6 @@
 
 - [ ] 8.2 Write property test for focus trap prevention
   - **Property 6: Focus trap prevention**
-
-
-
   - **Validates: Requirements 4.3**
 
 - [ ] 9. Integrate Model3DViewer into landing page
@@ -191,5 +184,210 @@
   - Test on low-end mobile devices for performance
   - _Requirements: 1.4_
 
-- [ ] 13. Final checkpoint - Ensure all tests pass
+- [ ] 13. Create audio management system
+- [ ] 13.1 Implement audioManager utility
+  - Create frontend/src/lib/audioManager.ts
+  - Implement AudioManager class with audio pooling
+  - Add preload method for loading audio files
+  - Add play method with overlap prevention
+  - Implement error handling for failed audio loads
+  - Add volume control and mute functionality
+  - _Requirements: 10.2, 10.3, 10.4_
+
+- [ ] 13.2 Write property test for audio overlap prevention
+  - **Property 15: Audio overlap prevention**
+  - **Validates: Requirements 6.5**
+
+- [ ] 13.3 Implement useScaryAudio hook
+  - Create frontend/src/hooks/useScaryAudio.ts
+  - Use AudioManager for audio playback
+  - Implement playHoverSound and playClickSound functions
+  - Add volume and mute state management
+  - Preload audio files on hook initialization
+  - Handle audio errors gracefully
+  - _Requirements: 6.1, 6.2, 6.3, 6.4_
+
+- [ ] 13.4 Write property tests for audio hooks
+  - **Property 11: Hover triggers audio**
+  - **Property 12: Click triggers audio**
+  - **Property 13: Volume controls affect audio**
+  - **Property 14: Audio preloading**
+  - **Validates: Requirements 6.1, 6.2, 6.3, 6.4**
+
+- [ ] 13.5 Write property test for audio error handling
+  - **Property 26: Audio error handling**
+  - **Validates: Requirements 10.3**
+
+- [ ] 14. Implement animation system
+- [ ] 14.1 Create useModelAnimations hook
+  - Create frontend/src/hooks/useModelAnimations.ts
+  - Initialize AnimationMixer from GLB animations
+  - Implement animation state machine (idle, hover, attack)
+  - Add playIdle, playHover, playAttack functions
+  - Implement smooth transitions between animations
+  - Handle missing animations gracefully
+  - Return animation progress for synchronization
+  - _Requirements: 7.1, 7.2, 7.3, 7.4_
+
+- [ ] 14.2 Write property tests for animation state transitions
+  - **Property 17: Hover triggers animation**
+  - **Property 18: Click triggers animation**
+  - **Property 19: Animation state returns to idle**
+  - **Validates: Requirements 7.2, 7.3, 7.4**
+
+- [ ] 14.3 Integrate animations into Scene3D component
+  - Import useModelAnimations hook in Scene3D
+  - Set up AnimationMixer and update loop
+  - Connect animation state to interaction events
+  - Test animation playback with both model types
+  - _Requirements: 7.1, 7.2, 7.3, 7.4_
+
+- [ ] 15. Add glowing eyes and scary lighting effects
+  - Modify Scene3D to add eye glow configuration
+  - Apply emissive materials to eye meshes (if available in model)
+  - Add point lights at eye positions with red color
+  - Increase light intensity on hover and attack states
+  - Test lighting effects with both model types
+  - _Requirements: 8.1_
+
+- [ ] 16. Implement particle effects system
+- [ ] 16.1 Create ScaryEffects component
+  - Create frontend/src/components/ScaryEffects.tsx
+  - Implement particle system for smoke effects
+  - Implement particle system for sparks
+  - Implement particle system for blood splatter
+  - Add props for controlling which effects are active
+  - Optimize particle count for mobile devices
+  - _Requirements: 8.2_
+
+- [ ] 16.2 Write property test for particle effects
+  - **Property 20: Interaction triggers particles**
+  - **Validates: Requirements 8.2**
+
+- [ ] 16.3 Add post-processing effects
+  - Import EffectComposer from @react-three/postprocessing
+  - Add Bloom effect for glowing elements
+  - Add color grading for scary atmosphere
+  - Add optional vignette effect
+  - Test performance impact on mobile
+  - _Requirements: 8.3_
+
+- [ ] 17. Coordinate audio, animations, and effects
+- [ ] 17.1 Implement interaction event handlers
+  - Add onPointerEnter handler for hover state
+  - Add onPointerLeave handler to return to idle
+  - Add onClick handler for attack state
+  - Coordinate audio, animation, and particle triggers
+  - Add cleanup for interrupted interactions
+  - _Requirements: 6.1, 6.2, 7.2, 7.3, 8.2_
+
+- [ ] 17.2 Write property test for effect synchronization
+  - **Property 21: Effects synchronized with animations**
+  - **Validates: Requirements 8.4**
+
+- [ ] 17.3 Test interaction flow
+  - Test idle → hover → idle transition
+  - Test idle → hover → attack → idle transition
+  - Test rapid interactions (spam clicking)
+  - Verify audio doesn't overlap
+  - Verify animations transition smoothly
+  - _Requirements: 6.5, 7.4, 8.4_
+
+- [ ] 18. Implement accessibility and motion preferences
+- [ ] 18.1 Add prefers-reduced-motion detection
+  - Detect prefers-reduced-motion media query
+  - Store preference in component state
+  - Disable auto-rotation when reduced motion is preferred
+  - Disable automatic animations when reduced motion is preferred
+  - Allow manual interactions with simplified animations
+  - _Requirements: 9.1, 9.2, 9.3_
+
+- [ ] 18.2 Write property tests for reduced motion
+  - **Property 16: Motion preference respected**
+  - **Property 22: Reduced motion disables animations**
+  - **Property 23: Reduced motion allows interactions**
+  - **Validates: Requirements 6.6, 9.2, 9.3**
+
+- [ ] 18.3 Create manual effects toggle control
+  - Add UI toggle button for enabling/disabling effects
+  - Connect toggle to audio, animation, and particle systems
+  - Style toggle to match Halloween theme
+  - Add ARIA labels for accessibility
+  - _Requirements: 9.4_
+
+- [ ] 18.4 Write property test for effects toggle
+  - **Property 24: Effects toggle changes state**
+  - **Validates: Requirements 9.4**
+
+- [ ] 18.5 Implement preference persistence
+  - Save mute preference to localStorage
+  - Save effects enabled preference to localStorage
+  - Load preferences on component mount
+  - Test persistence across page reloads
+  - _Requirements: 9.5_
+
+- [ ] 18.6 Write property test for preference persistence
+  - **Property 25: Preferences persist across reloads**
+  - **Validates: Requirements 9.5**
+
+- [ ] 19. Implement mouse tracking system
+- [ ] 19.1 Create useMouseTracking hook
+  - Create frontend/src/hooks/useMouseTracking.ts
+  - Track mouse position using mousemove event listener
+  - Convert mouse coordinates to normalized device coordinates (-1 to 1)
+  - Calculate target rotation angles based on mouse position
+  - Apply sensitivity and rotation limits from configuration
+  - Implement smooth interpolation (lerp) for rotation changes
+  - Disable tracking when prefers-reduced-motion is enabled
+  - _Requirements: 11.1, 11.2, 11.3, 11.5_
+
+- [ ] 19.2 Write property tests for mouse tracking
+  - **Property 27: Mouse tracking rotates model**
+  - **Property 28: Smooth mouse tracking interpolation**
+  - **Property 29: Mouse tracking rotation limits**
+  - **Property 30: Reduced motion disables mouse tracking**
+  - **Validates: Requirements 11.1, 11.2, 11.3, 11.5**
+
+- [ ] 19.3 Integrate mouse tracking into Scene3D
+  - Import useMouseTracking hook in Scene3D component
+  - Apply target rotation to model or specific bone (head/neck)
+  - Use useFrame to smoothly update rotation each frame
+  - Test tracking with both model types
+  - Verify rotation limits prevent unnatural poses
+  - _Requirements: 11.1, 11.4, 11.6_
+
+- [ ] 19.4 Test mouse tracking interactions
+  - Test mouse tracking works across entire viewport
+  - Test tracking maintains state when mouse is stationary
+  - Test tracking is disabled during attack animations
+  - Test tracking respects prefers-reduced-motion
+  - Test on touch devices (should gracefully degrade)
+  - _Requirements: 11.1, 11.4, 11.5_
+
+- [ ] 20. Update landing page integration with scary features
+  - Update Model3DViewer import in page.tsx
+  - Enable audio, animations, effects, and mouse tracking props
+  - Configure respectMotionPreference prop
+  - Test z-index layering with new effects
+  - Verify effects don't obscure important content
+  - _Requirements: 3.1, 3.3, 3.5_
+
+- [ ] 21. Performance optimization for scary features
+  - Implement lazy loading for audio files
+  - Reduce particle count on mobile devices
+  - Disable post-processing on low-end devices
+  - Add FPS monitoring and auto-quality adjustment
+  - Test memory usage with all effects enabled
+  - Optimize audio file sizes (compression)
+  - _Requirements: 2.5, 8.5_
+
+- [ ] 22. Cross-browser testing for audio and effects
+  - Test audio playback on Chrome, Firefox, Safari, Edge
+  - Test autoplay policies and user gesture requirements
+  - Test WebGL effects on iOS Safari
+  - Test particle effects on Android Chrome
+  - Verify fallbacks work when features are unsupported
+  - _Requirements: 1.4, 10.5_
+
+- [ ] 23. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.

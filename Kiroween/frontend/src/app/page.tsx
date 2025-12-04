@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
-  FloatingGhosts, 
-  Bats, 
   SpiderWeb, 
-  Fog 
+  Fog,
+  BinaryRain,
+  GlitchErrors,
+  CircuitLines,
+  DataPackets
 } from '@/components/effects';
 import {
   GhostOrchestrator,
@@ -39,23 +41,31 @@ export default function Home() {
         Skip to main content
       </a>
       <main id="main-content" className="min-h-screen bg-gradient-haunted relative overflow-hidden" role="main">
-      {/* Atmospheric Effects - Reduced on mobile for performance */}
+      {/* IT-Themed Atmospheric Effects - Reduced on mobile for performance */}
       <SpiderWeb corner="top-left" aria-hidden="true" />
       <SpiderWeb corner="top-right" aria-hidden="true" />
+      
+      {/* Desktop effects */}
       <div className="hidden sm:block" aria-hidden="true">
-        <FloatingGhosts count={5} />
-        <Bats count={8} />
+        <BinaryRain count={15} />
+        <GlitchErrors count={6} />
+        <CircuitLines density="medium" />
+        <DataPackets count={10} />
       </div>
+      
+      {/* Mobile effects - reduced for performance */}
       <div className="sm:hidden" aria-hidden="true">
-        <FloatingGhosts count={3} />
-        <Bats count={4} />
+        <BinaryRain count={8} />
+        <GlitchErrors count={3} />
+        <CircuitLines density="low" />
       </div>
+      
       <Fog aria-hidden="true" />
       
       {/* Blood Moon Background */}
       <div className="absolute top-10 right-10 sm:top-20 sm:right-20 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blood-red rounded-full opacity-20 blur-3xl" aria-hidden="true" />
       
-      {/* 3D Model on Right Side */}
+      {/* 3D Model on Right Side - Now with scary interactive features! */}
       <motion.div 
         className="hidden lg:block absolute right-0 top-0 w-1/2 h-screen z-0"
         initial={{ opacity: 0, x: 100 }}
@@ -64,10 +74,15 @@ export default function Home() {
       >
         <Model3DViewer 
           modelPath={MODEL_CONFIGS.shaded.path}
-          autoRotate={true}
+          autoRotate={false}
           enableZoom={false}
           scale={1.5}
           position={[0, -1.5, 0]}
+          enableAudio={false}
+          enableAnimations={true}
+          enableEffects={true}
+          enableMouseTracking={true}
+          respectMotionPreference={true}
         />
       </motion.div>
 
