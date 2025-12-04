@@ -50,7 +50,9 @@ export class AudioManager {
    * @param configs - Array of audio configurations
    */
   async preloadMultiple(configs: AudioConfig[]): Promise<void> {
-    const promises = configs.map(config => this.preloadAudio(config.path));
+    const promises = configs
+      .filter(config => config && config.path) // Filter out undefined configs
+      .map(config => this.preloadAudio(config.path));
     await Promise.allSettled(promises);
   }
 

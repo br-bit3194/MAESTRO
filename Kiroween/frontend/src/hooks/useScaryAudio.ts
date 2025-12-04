@@ -26,19 +26,9 @@ export interface ScaryAudioConfig {
 
 // Default scary audio configuration
 export const SCARY_AUDIO: ScaryAudioConfig = {
-  hover: {
-    path: '/sounds/ambient_hover.mp3',
-    volume: 0.5,
-    loop: false,
-  },
-  click: {
-    path: '/sounds/scream_click.mp3',
-    volume: 0.7,
-    loop: false,
-  },
   ambient: {
-    path: '/sounds/whisper.mp3',
-    volume: 0.3,
+    path: '/sounds/raone.mp3',
+    volume: 0.2,
     loop: true,
   },
 };

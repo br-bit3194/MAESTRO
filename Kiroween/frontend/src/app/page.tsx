@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { 
   SpiderWeb, 
   Fog,
@@ -23,6 +24,7 @@ import {
 } from '@/components/agents';
 import dynamic from 'next/dynamic';
 import { MODEL_CONFIGS } from '@/components/Model3DViewer';
+import { useScaryAudio } from '@/hooks/useScaryAudio';
 
 // Lazy load 3D viewer for better initial page load performance
 const Model3DViewer = dynamic(
@@ -38,11 +40,43 @@ const Model3DViewer = dynamic(
 );
 
 export default function Home() {
+  // Initialize audio with background theme
+  const { playAmbientSound, stopAmbientSound, isLoaded, isMuted, toggleMute } = useScaryAudio(true);
+
+  // Auto-play background music when page loads
+  useEffect(() => {
+    if (isLoaded) {
+      // Small delay to ensure user interaction (some browsers require this)
+      const timer = setTimeout(() => {
+        playAmbientSound();
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
+        stopAmbientSound();
+      };
+    }
+  }, [isLoaded, playAmbientSound, stopAmbientSound]);
   return (
     <>
       <a href="#main-content" className="skip-to-main">
         Skip to main content
       </a>
+      
+      {/* Audio Control Button */}
+      <motion.button
+        onClick={toggleMute}
+        className="fixed top-4 right-4 z-50 p-3 bg-bg-tombstone border-2 border-pumpkin-orange rounded-full hover:bg-pumpkin-orange/20 transition-colors focus:outline-none focus:ring-4 focus:ring-pumpkin-orange/50"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        aria-label={isMuted ? "Unmute background music" : "Mute background music"}
+        title={isMuted ? "Unmute background music" : "Mute background music"}
+      >
+        <span className="text-2xl" aria-hidden="true">
+          {isMuted ? '🔇' : '🔊'}
+        </span>
+      </motion.button>
+
       <main id="main-content" className="min-h-screen bg-gradient-to-b from-black via-bg-crypt to-black relative overflow-hidden" role="main">
       {/* Intense Scary Effects */}
       <ScreenGlitch />
