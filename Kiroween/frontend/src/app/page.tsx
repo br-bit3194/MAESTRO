@@ -8,7 +8,10 @@ import {
   BinaryRain,
   GlitchErrors,
   CircuitLines,
-  DataPackets
+  DataPackets,
+  ScreenGlitch,
+  RedVignette,
+  FlickeringLights
 } from '@/components/effects';
 import {
   GhostOrchestrator,
@@ -40,34 +43,56 @@ export default function Home() {
       <a href="#main-content" className="skip-to-main">
         Skip to main content
       </a>
-      <main id="main-content" className="min-h-screen bg-gradient-haunted relative overflow-hidden" role="main">
+      <main id="main-content" className="min-h-screen bg-gradient-to-b from-black via-bg-crypt to-black relative overflow-hidden" role="main">
+      {/* Intense Scary Effects */}
+      <ScreenGlitch />
+      <RedVignette />
+      <FlickeringLights />
+      
       {/* IT-Themed Atmospheric Effects - Reduced on mobile for performance */}
       <SpiderWeb corner="top-left" aria-hidden="true" />
       <SpiderWeb corner="top-right" aria-hidden="true" />
       
       {/* Desktop effects */}
       <div className="hidden sm:block" aria-hidden="true">
-        <BinaryRain count={15} />
-        <GlitchErrors count={6} />
-        <CircuitLines density="medium" />
-        <DataPackets count={10} />
+        <BinaryRain count={20} />
+        <GlitchErrors count={8} />
+        <CircuitLines density="high" />
+        <DataPackets count={15} />
       </div>
       
       {/* Mobile effects - reduced for performance */}
       <div className="sm:hidden" aria-hidden="true">
-        <BinaryRain count={8} />
-        <GlitchErrors count={3} />
-        <CircuitLines density="low" />
+        <BinaryRain count={10} />
+        <GlitchErrors count={4} />
+        <CircuitLines density="medium" />
+        <DataPackets count={5} />
       </div>
       
       <Fog aria-hidden="true" />
       
-      {/* Blood Moon Background */}
-      <div className="absolute top-10 right-10 sm:top-20 sm:right-20 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blood-red rounded-full opacity-20 blur-3xl" aria-hidden="true" />
+      {/* Blood Moon Background - Enhanced */}
+      <motion.div 
+        className="absolute top-10 right-10 sm:top-20 sm:right-20 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blood-red rounded-full blur-3xl" 
+        animate={{
+          opacity: [0.3, 0.5, 0.3],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        aria-hidden="true" 
+      />
+      
+      {/* Additional ominous glows */}
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-phantom-purple rounded-full opacity-10 blur-3xl" aria-hidden="true" />
+      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-spectral-green rounded-full opacity-10 blur-3xl" aria-hidden="true" />
       
       {/* 3D Model on Right Side - Now with scary interactive features! */}
       <motion.div 
-        className="hidden lg:block absolute right-0 top-0 w-1/2 h-screen z-0"
+        className="hidden lg:block absolute right-0 top-0 w-1/2 h-screen z-10"
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1.5, delay: 0.5 }}
@@ -96,24 +121,81 @@ export default function Home() {
         >
           <motion.h1
             id="hero-title"
-            className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-creepster text-pumpkin-orange mb-6 drop-shadow-[0_0_30px_rgba(255,117,24,0.5)]"
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-creepster text-pumpkin-orange mb-6 relative"
+            style={{
+              textShadow: '0 0 30px rgba(255,117,24,0.8), 0 0 60px rgba(139,0,0,0.6)',
+            }}
             animate={{ 
               textShadow: [
-                "0 0 30px rgba(255,117,24,0.5)",
-                "0 0 50px rgba(255,117,24,0.8)",
-                "0 0 30px rgba(255,117,24,0.5)"
+                "0 0 30px rgba(255,117,24,0.8), 0 0 60px rgba(139,0,0,0.6)",
+                "0 0 50px rgba(255,117,24,1), 0 0 80px rgba(139,0,0,0.8), 0 0 100px rgba(255,0,0,0.4)",
+                "0 0 30px rgba(255,117,24,0.8), 0 0 60px rgba(139,0,0,0.6)"
               ]
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            MAESTRO
+            <span className="relative inline-block">
+              MAESTRO
+              {/* Glitch layers */}
+              <motion.span
+                className="absolute top-0 left-0 text-blood-red opacity-70"
+                style={{ clipPath: 'inset(0 0 0 0)' }}
+                animate={{
+                  x: [-2, 2, -2],
+                  clipPath: [
+                    'inset(0 0 0 0)',
+                    'inset(40% 0 30% 0)',
+                    'inset(0 0 0 0)',
+                  ],
+                }}
+                transition={{
+                  duration: 0.2,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                }}
+                aria-hidden="true"
+              >
+                MAESTRO
+              </motion.span>
+              <motion.span
+                className="absolute top-0 left-0 text-spectral-green opacity-70"
+                style={{ clipPath: 'inset(0 0 0 0)' }}
+                animate={{
+                  x: [2, -2, 2],
+                  clipPath: [
+                    'inset(0 0 0 0)',
+                    'inset(20% 0 50% 0)',
+                    'inset(0 0 0 0)',
+                  ],
+                }}
+                transition={{
+                  duration: 0.2,
+                  repeat: Infinity,
+                  repeatDelay: 3,
+                  delay: 0.1,
+                }}
+                aria-hidden="true"
+              >
+                MAESTRO
+              </motion.span>
+            </span>
           </motion.h1>
           
           <motion.p
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-spectral-green font-creepster mb-8 sm:mb-12 px-4"
+            animate={{ 
+              opacity: [0.7, 1, 0.7],
+            }}
+            transition={{ 
+              delay: 0.5, 
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-blood-red font-creepster mb-8 sm:mb-12 px-4"
+            style={{
+              textShadow: '0 0 20px rgba(139, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4)',
+            }}
           >
             Where IT Nightmares Come to Die
           </motion.p>
@@ -128,12 +210,29 @@ export default function Home() {
           >
             <Link href="/demo">
               <motion.button
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 0 30px rgba(139, 0, 0, 0.8), 0 0 60px rgba(255, 0, 0, 0.4)',
+                }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-blood-moon text-bone-white font-creepster text-lg sm:text-xl rounded-lg shadow-lg hover:shadow-blood-red/50 transition-shadow focus:outline-none focus:ring-4 focus:ring-pumpkin-orange/50"
+                animate={{
+                  boxShadow: [
+                    '0 0 20px rgba(139, 0, 0, 0.4)',
+                    '0 0 30px rgba(139, 0, 0, 0.6)',
+                    '0 0 20px rgba(139, 0, 0, 0.4)',
+                  ],
+                }}
+                transition={{
+                  boxShadow: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  },
+                }}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-blood-moon text-bone-white font-creepster text-lg sm:text-xl rounded-lg shadow-lg border-2 border-blood-red/50 focus:outline-none focus:ring-4 focus:ring-blood-red/50"
                 aria-label="Enter the Crypt - Go to demo page"
               >
-                🎃 Enter the Crypt
+                💀 Enter the Crypt
               </motion.button>
             </Link>
             

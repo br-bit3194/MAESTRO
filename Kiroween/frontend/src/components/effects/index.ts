@@ -10,3 +10,8 @@ export { default as GlitchErrors } from './GlitchErrors';
 export { default as CircuitLines } from './CircuitLines';
 export { default as DataPackets } from './DataPackets';
 export { default as TerminalCursors } from './TerminalCursors';
+
+// Intense scary effects
+export { default as ScreenGlitch } from './ScreenGlitch';
+export { default as RedVignette } from './RedVignette';
+export { default as FlickeringLights } from './FlickeringLights';
