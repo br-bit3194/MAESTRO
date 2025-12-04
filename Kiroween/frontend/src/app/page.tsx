@@ -16,6 +16,21 @@ import {
   ReaperCloud,
   MummySummarization
 } from '@/components/agents';
+import dynamic from 'next/dynamic';
+import { MODEL_CONFIGS } from '@/components/Model3DViewer';
+
+// Lazy load 3D viewer for better initial page load performance
+const Model3DViewer = dynamic(
+  () => import('@/components/Model3DViewer').then(mod => ({ default: mod.Model3DViewer })),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full w-full">
+        <div className="text-spectral-green font-creepster">Loading 3D...</div>
+      </div>
+    )
+  }
+);
 
 export default function Home() {
   return (
@@ -40,13 +55,29 @@ export default function Home() {
       {/* Blood Moon Background */}
       <div className="absolute top-10 right-10 sm:top-20 sm:right-20 w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 bg-blood-red rounded-full opacity-20 blur-3xl" aria-hidden="true" />
       
+      {/* 3D Model on Right Side */}
+      <motion.div 
+        className="hidden lg:block absolute right-0 top-0 w-1/2 h-screen z-0"
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.5, delay: 0.5 }}
+      >
+        <Model3DViewer 
+          modelPath={MODEL_CONFIGS.shaded.path}
+          autoRotate={true}
+          enableZoom={false}
+          scale={1.5}
+          position={[0, -1.5, 0]}
+        />
+      </motion.div>
+
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8" aria-labelledby="hero-title">
+      <section className="relative z-10 min-h-screen flex flex-col items-center lg:items-start justify-center px-4 sm:px-6 lg:px-8 lg:pl-16" aria-labelledby="hero-title">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center mb-12"
+          className="text-center lg:text-left mb-12 lg:max-w-xl"
         >
           <motion.h1
             id="hero-title"

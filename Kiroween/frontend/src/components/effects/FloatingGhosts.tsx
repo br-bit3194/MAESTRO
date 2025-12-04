@@ -9,17 +9,29 @@ interface FloatingGhostsProps {
 
 export default function FloatingGhosts({ count = 5 }: FloatingGhostsProps) {
   const [windowHeight, setWindowHeight] = useState(1000); // Default fallback
+  const [ghosts, setGhosts] = useState<Array<{
+    id: number;
+    left: string;
+    delay: number;
+    duration: number;
+  }>>([]);
   
   useEffect(() => {
     setWindowHeight(window.innerHeight);
-  }, []);
-  
-  const ghosts = Array.from({ length: count }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    delay: Math.random() * 5,
-    duration: 15 + Math.random() * 10,
-  }));
+    
+    // Generate ghost positions on client side only
+    setGhosts(Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      delay: Math.random() * 5,
+      duration: 15 + Math.random() * 10,
+    })));
+  }, [count]);
+
+  // Don't render until client-side hydration is complete
+  if (ghosts.length === 0) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
