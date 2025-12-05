@@ -7,7 +7,7 @@ Provides REST API endpoints for ticket management and workflow processing.
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 import boto3
@@ -18,7 +18,7 @@ import shutil
 
 # Import Haunted Helpdesk components
 from backend.dynamodb_utils import db_manager
-from backend.Haunted Helpdesk_swarm import create_Haunted Helpdesk_swarm
+from backend.Helpdesk_swarm import create_Haunted_Helpdesk_swarm
 from backend.multimodal_input import process_multimodal_input
 
 
@@ -57,7 +57,7 @@ class TicketCreate(BaseModel):
     severity: str = Field(..., description="Severity level: low, medium, high, critical")
     category: str = Field(..., description="Category: network, cloud, other")
     
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "title": "S3 Bucket Access Denied",
@@ -66,6 +66,7 @@ class TicketCreate(BaseModel):
                 "category": "cloud"
             }
         }
+    )
 
 
 class TicketResponse(BaseModel):
@@ -80,7 +81,7 @@ class TicketResponse(BaseModel):
     updated_at: str = Field(..., description="ISO 8601 timestamp of last update")
     resolution: Optional[str] = Field(None, description="Resolution summary if resolved")
     
-    class Config:
+    model_config = ConfigDict(
         json_schema_extra = {
             "example": {
                 "ticket_id": "550e8400-e29b-41d4-a716-446655440000",
@@ -94,6 +95,7 @@ class TicketResponse(BaseModel):
                 "resolution": "Bucket permissions were updated to allow access."
             }
         }
+    )
 
 
 # API Endpoints
@@ -105,7 +107,7 @@ async def health_check() -> Dict[str, Any]:
     
     Checks:
     - AWS Bedrock availability (Claude 3.5 Sonnet model)
-    - DynamoDB table accessibility (Haunted HelpdeskTickets)
+    - DynamoDB table accessibility (HauntedHelpdeskTickets)
     
     Returns:
         JSON object with overall status and individual service statuses
@@ -486,7 +488,7 @@ async def process_ticket(ticket_id: str) -> Dict[str, Any]:
         db_manager.update_ticket(ticket_id, update_data)
         
         # Step 3: Initialize Haunted Helpdesk swarm
-        swarm = create_Haunted Helpdesk_swarm()
+        swarm = create_Haunted_Helpdesk_swarm()
         
         # Prepare ticket content for workflow
         ticket_content = f"""
@@ -502,10 +504,7 @@ Created: {ticket['created_at']}
         # The swarm starts with the orchestrator agent by default
         start_time = time.time()
         
-        result = swarm.execute(
-            initial_message=ticket_content,
-            starting_agent_name="orchestrator_agent"
-        )
+        result = await swarm.invoke_async(task=ticket_content)
         
         execution_time = time.time() - start_time
         
@@ -589,7 +588,7 @@ Created: {ticket['created_at']}
         
         raise HTTPException(
             status_code=500,
-            detail=f"Unexpected error processing ticket: {str(e)}"
+            detail=f"Unexpected error processing ticket: {str(e)}\n\nTraceback:\n{error_trace}"
         )
 
 
@@ -798,7 +797,7 @@ async def process_ticket_workflow(ticket_id: str, ticket_content: str):
     
     try:
         # Initialize Haunted Helpdesk swarm
-        swarm = create_Haunted Helpdesk_swarm()
+        swarm = create_Haunted_Helpdesk_swarm()
         
         # Prepare ticket content for workflow
         ticket = db_manager.get_ticket(ticket_id)

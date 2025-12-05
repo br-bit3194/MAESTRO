@@ -1,7 +1,7 @@
 """
 DynamoDB utilities for Haunted Helpdesk ticket management.
 
-This module provides a DynamoDBManager class for CRUD operations on the Haunted HelpdeskTickets table.
+This module provides a DynamoDBManager class for CRUD operations on the HauntedHelpdeskTickets table.
 """
 
 import boto3
@@ -12,14 +12,14 @@ import json
 
 
 class DynamoDBManager:
-    """Manager class for DynamoDB operations on Haunted HelpdeskTickets table."""
+    """Manager class for DynamoDB operations on HauntedHelpdeskTickets table."""
     
-    def __init__(self, table_name: str = "Haunted HelpdeskTickets"):
+    def __init__(self, table_name: str = "HauntedHelpdeskTickets"):
         """
-        Initialize DynamoDB manager with connection to Haunted HelpdeskTickets table.
+        Initialize DynamoDB manager with connection to HauntedHelpdeskTickets table.
         
         Args:
-            table_name: Name of the DynamoDB table (default: Haunted HelpdeskTickets)
+            table_name: Name of the DynamoDB table (default: HauntedHelpdeskTickets)
         """
         self.dynamodb = boto3.resource('dynamodb')
         self.table_name = table_name

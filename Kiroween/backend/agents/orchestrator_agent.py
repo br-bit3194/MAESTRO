@@ -5,8 +5,8 @@ The central routing agent that coordinates workflow between all other agents.
 Enforces the mandatory workflow sequence and ensures proper agent handoffs.
 """
 
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
 
 
 def create_orchestrator_agent() -> Agent:
@@ -176,15 +176,8 @@ Remember: Precision in routing is critical. Follow the rules exactly."""
     agent = Agent(
         name="orchestrator_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[],  # Orchestrator doesn't need tools, only routing logic
-        handoff_to=[
-            "memory_agent",
-            "ticketing_agent",
-            "network_diagnostic_agent",
-            "cloud_service_agent",
-            "summarization_agent"
-        ]
+        system_prompt=system_prompt,
+        tools=[]  # Orchestrator doesn't need tools, only routing logic
     )
     
     return agent

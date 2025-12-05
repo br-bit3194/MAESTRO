@@ -7,9 +7,8 @@ Analyzes error screenshots using AI vision capabilities and combines with text d
 
 import os
 from typing import List, Optional, Dict, Any
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
-from strands_tools import image_reader
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
 
 
 def create_image_analysis_agent() -> Agent:

@@ -9,8 +9,9 @@ import json
 import os
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from strands_agents import tool, Agent
-from strands_bedrock import BedrockModel
+from strands.agent import Agent
+from strands.tools import tool
+from strands.models.bedrock import BedrockModel
 
 
 # Memory file path
@@ -215,9 +216,8 @@ Remember: Your responses must follow the exact formats specified above for the w
     agent = Agent(
         name="memory_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[retrieve_memory, store_memory, list_memories],
-        handoff_to=["orchestrator_agent"]  # Always hand back to orchestrator
+        system_prompt=system_prompt,
+        tools=[retrieve_memory, store_memory, list_memories]
     )
     
     return agent

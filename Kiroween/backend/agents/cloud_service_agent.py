@@ -5,9 +5,9 @@ Performs automated AWS cloud troubleshooting using cloud diagnostic tools.
 Analyzes S3 bucket issues and provides resolution steps for cloud service problems.
 """
 
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
-from tools.cloud_tools import list_all_buckets, get_bucket_location, check_bucket_exists
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
+from backend.tools.cloud_tools import list_all_buckets, get_bucket_location, check_bucket_exists
 
 
 def create_cloud_service_agent() -> Agent:
@@ -85,9 +85,8 @@ Remember: Your goal is to diagnose the cloud issue and provide complete, actiona
     agent = Agent(
         name="cloud_service_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[list_all_buckets, get_bucket_location, check_bucket_exists],
-        handoff_to=["orchestrator_agent"]  # Hand back to orchestrator with complete resolution
+        system_prompt=system_prompt,
+        tools=[list_all_buckets, get_bucket_location, check_bucket_exists]
     )
     
     return agent

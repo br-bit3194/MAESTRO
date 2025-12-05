@@ -23,7 +23,7 @@ The `/health` endpoint has been successfully implemented in `backend/main.py` to
     "dynamodb": {
       "available": true | false,
       "status": "active" | "error",
-      "table_name": "Haunted HelpdeskTickets",
+      "table_name": "HauntedHelpdeskTickets",
       "message": "DynamoDB table is ACTIVE"
     }
   }

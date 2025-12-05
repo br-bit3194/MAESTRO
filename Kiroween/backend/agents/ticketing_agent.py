@@ -11,8 +11,8 @@ response signals. The agent doesn't directly update DynamoDB - it signals what s
 happen through its response format, and the backend interprets these signals.
 """
 
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
 
 
 def create_ticketing_agent() -> Agent:
@@ -139,9 +139,8 @@ Remember: You are the gatekeeper of workflow termination. Scenarios 1 and 3 END 
     agent = Agent(
         name="ticketing_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[],  # No tools - DynamoDB updates handled by backend based on response signals
-        handoff_to=["orchestrator_agent"]  # Only used in Scenario 2
+        system_prompt=system_prompt,
+        tools=[]  # No tools - DynamoDB updates handled by backend based on response signals
     )
     
     return agent

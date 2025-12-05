@@ -5,9 +5,9 @@ Performs automated network troubleshooting using diagnostic tools.
 Analyzes connectivity, routing, and DNS issues to provide root cause analysis.
 """
 
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
-from tools.network_tools import ping_host, traceroute_host, check_dns_resolution
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
+from backend.tools.network_tools import ping_host, traceroute_host, check_dns_resolution
 
 
 def create_network_diagnostic_agent() -> Agent:
@@ -76,9 +76,8 @@ Remember: Your goal is to diagnose the network issue and provide actionable reso
     agent = Agent(
         name="network_diagnostic_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[ping_host, traceroute_host, check_dns_resolution],
-        handoff_to=["summarization_agent"]  # Always hand to summarization after completion
+        system_prompt=system_prompt,
+        tools=[ping_host, traceroute_host, check_dns_resolution]
     )
     
     return agent

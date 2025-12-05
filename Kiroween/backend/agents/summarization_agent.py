@@ -5,8 +5,8 @@ Creates concise 2-3 paragraph summaries of incident resolutions.
 Extracts key information and signals workflow completion.
 """
 
-from strands_agents import Agent
-from strands_bedrock import BedrockModel
+from strands.agent import Agent
+from strands.models.bedrock import BedrockModel
 
 
 def create_summarization_agent() -> Agent:
@@ -70,9 +70,8 @@ Remember: Your summary will be stored in the ticket and used for future referenc
     agent = Agent(
         name="summarization_agent",
         model=model,
-        instructions=system_prompt,
-        tools=[],  # No tools needed for summarization
-        handoff_to=["orchestrator_agent"]  # Always hand back to orchestrator after completion
+        system_prompt=system_prompt,
+        tools=[]  # No tools needed for summarization
     )
     
     return agent

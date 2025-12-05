@@ -7,7 +7,7 @@ Provides AWS cloud troubleshooting capabilities including S3 bucket operations.
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 from typing import Dict, Any
-from strands_agents import tool
+from strands.tools import tool
 
 
 @tool

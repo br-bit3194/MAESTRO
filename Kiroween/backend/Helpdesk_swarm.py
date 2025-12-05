@@ -5,16 +5,16 @@ Creates and configures the Haunted Helpdesk multi-agent swarm with all six speci
 Manages swarm parameters including handoff limits, timeouts, and repetitive handoff detection.
 """
 
-from strands_agents import Swarm
-from agents.orchestrator_agent import create_orchestrator_agent
-from agents.memory_agent import create_memory_agent
-from agents.ticketing_agent import create_ticketing_agent
-from agents.network_diagnostic_agent import create_network_diagnostic_agent
-from agents.cloud_service_agent import create_cloud_service_agent
-from agents.summarization_agent import create_summarization_agent
+from strands.multiagent import Swarm
+from backend.agents.orchestrator_agent import create_orchestrator_agent
+from backend.agents.memory_agent import create_memory_agent
+from backend.agents.ticketing_agent import create_ticketing_agent
+from backend.agents.network_diagnostic_agent import create_network_diagnostic_agent
+from backend.agents.cloud_service_agent import create_cloud_service_agent
+from backend.agents.summarization_agent import create_summarization_agent
 
 
-def create_Haunted Helpdesk_swarm() -> Swarm:
+def create_Haunted_Helpdesk_swarm() -> Swarm:
     """
     Create and configure the Haunted Helpdesk multi-agent swarm.
     
@@ -39,7 +39,7 @@ def create_Haunted Helpdesk_swarm() -> Swarm:
     
     # Create swarm with all agents and configuration parameters
     swarm = Swarm(
-        agents=[
+        nodes=[
             orchestrator,
             memory,
             ticketing,
@@ -47,6 +47,7 @@ def create_Haunted Helpdesk_swarm() -> Swarm:
             cloud_service,
             summarization
         ],
+        entry_point=orchestrator,
         max_handoffs=20,  # Maximum number of agent handoffs before termination
         max_iterations=25,  # Maximum iterations per agent
         execution_timeout=600.0,  # Total workflow timeout in seconds (10 minutes)

@@ -7,7 +7,7 @@ Provides network troubleshooting capabilities including ping, traceroute, and DN
 import subprocess
 import platform
 from typing import Dict, Any
-from strands_agents import tool
+from strands.tools import tool
 
 
 @tool
